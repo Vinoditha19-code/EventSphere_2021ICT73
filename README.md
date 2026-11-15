@@ -14,10 +14,9 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m uvicorn main:app --reload
 ```
 
-Run `demo_users.py` once on a new database. It asks you to choose passwords
-for the admin, staff, and attendee accounts.
+Run `demo_users.py` once on a new database. It asks you to choose passwords for the three demo accounts.
 
-Open http://127.0.0.1:8000 after the server starts.
+Open [EventSphere](http://127.0.0.1:8000) after the server starts.
 
 ## Demo accounts
 
@@ -28,3 +27,7 @@ Open http://127.0.0.1:8000 after the server starts.
 ## Environment variables
 
 The current local SQLite setup does not require any environment variables.
+
+## Testing screenshots
+
+![Successful ticket booking in Postman](screenshots/booking.png)
