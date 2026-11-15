@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>EventSphere Check-in</title>
+</head>
+<body>
+    <h1>Ticket check-in</h1>
+
+    <form id="check-in">
+        <p><label>Event ID <input id="event-id" type="number" min="1" required></label></p>
+        <p><label>Ticket code <input id="ticket-code" required></label></p>
+        <button type="submit">Check in</button>
+    </form>
+
+    <p id="result" role="status"></p>
+
+    <script>
+        document.getElementById("check-in").onsubmit = async function (event) {
+            event.preventDefault();
+
+            const response = await fetch("/check-in", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    event_id: Number(document.getElementById("event-id").value),
+                    code: document.getElementById("ticket-code").value.trim()
+                })
+            });
+
+            const data = await response.json();
+            document.getElementById("result").textContent =
+                data.message || data.detail;
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+pwdlib[argon2]
+qrcode[pil] 
+itsdangerous
+fastapi
+uvicorn 
