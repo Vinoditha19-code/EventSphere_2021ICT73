@@ -1,5 +1,6 @@
-.venv/
-.venv314/
-__pycache__/
-*.db
 .env
+.session_secret
+.venv/
+__pycache__/
+.pytest_cache/
+eventsphere.db

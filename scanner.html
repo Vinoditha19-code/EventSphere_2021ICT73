@@ -3,35 +3,701 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>EventSphere Check-in</title>
+    <title>EventSphere | Staff check-in</title>
+    <style>
+
+        :root {
+            --purple: #7040c8;
+            --purple-dark: #54309a;
+            --ink: #2b1c3f;
+            --muted: #776883;
+            --line: #e9e1f2;
+            --surface: #ffffff;
+            --background: #f8f6fc;
+            --soft: #f2ebfc;
+            --shadow: 0 8px 30px rgba(55, 26, 91, 0.045);
+        }
+
+        * { box-sizing: border-box; }
+        [hidden] { display: none !important; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", sans-serif;
+            color: var(--ink);
+            background: var(--background);
+        }
+        button, input, textarea, select { font: inherit; }
+        button {
+            min-height: 44px;
+            padding: 12px 19px;
+            border: 1px solid transparent;
+            border-radius: 11px;
+            background: var(--purple);
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .18s ease, box-shadow .18s ease;
+        }
+        button:hover { background: var(--purple-dark); }
+        button:disabled { opacity: .55; cursor: default; }
+        button:focus-visible, input:focus-visible,
+        textarea:focus-visible, select:focus-visible {
+            outline: 3px solid #cbb5f3;
+            outline-offset: 3px;
+        }
+        .secondary {
+            background: var(--soft);
+            color: #6338a2;
+        }
+        .secondary:hover { background: #e7d9f8; }
+        .danger { color: #b12f49; background: #fff0f3; }
+        .danger:hover { background: #fbdfe6; }
+        h1, h2, h3 { overflow-wrap: anywhere; }
+        h1 { margin: 0; font-size: 23px; letter-spacing: -.8px; }
+        h2 { margin: 0 0 12px; font-size: 27px; letter-spacing: -.9px; }
+        h3 { margin: 0 0 14px; font-size: 21px; letter-spacing: -.5px; }
+        p {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.75;
+            overflow-wrap: anywhere;
+        }
+        label {
+            display: block;
+            margin: 18px 0 9px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #594767;
+        }
+        input, select, textarea {
+            width: 100%;
+            min-width: 0;
+            min-height: 48px;
+            padding: 13px 14px;
+            border: 1px solid #e3d9ed;
+            border-radius: 11px;
+            color: var(--ink);
+            background: #fcfbfe;
+            font-size: 14px;
+            transition: border-color .18s ease, box-shadow .18s ease;
+        }
+        input::placeholder, textarea::placeholder { color: #978b9f; }
+        input:focus, select:focus, textarea:focus {
+            border-color: #a57cd9;
+            box-shadow: 0 0 0 3px #f1e9fc;
+        }
+        textarea { min-height: 115px; resize: vertical; }
+        input[type="file"]::file-selector-button {
+            padding: 9px 13px;
+            margin-right: 12px;
+            border: 0;
+            border-radius: 7px;
+            background: #eee5fc;
+            color: #6338a2;
+            cursor: pointer;
+        }
+        header {
+            padding: 24px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--line);
+        }
+        .header-content, nav, .content, .admin-content {
+            width: 100%;
+            max-width: 1180px;
+            margin: auto;
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        .brand { display: flex; align-items: center; gap: 13px; min-width: 0; }
+        .logo {
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: linear-gradient(145deg, #8755dc, #5d2cac);
+            box-shadow: 0 6px 16px #7040c824;
+            color: white;
+            font-size: 25px;
+            font-weight: 700;
+        }
+        header p { margin: 4px 0 0; font-size: 12px; }
+        .brand-role {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 4px 7px;
+            border-radius: 6px;
+            vertical-align: middle;
+            background: #f2ebfc;
+            color: #79539d;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .signout-form { margin: 0; flex-shrink: 0; }
+        .signout-form button {
+            min-height: 40px;
+            white-space: nowrap;
+            border: 1px solid var(--line);
+            background: white;
+            color: #715783;
+            font-size: 12px;
+        }
+        .signout-form button:hover { background: var(--soft); }
+        .navigation {
+            padding: 12px 24px;
+            background: white;
+            border-bottom: 1px solid var(--line);
+        }
+        nav { display: flex; flex-wrap: wrap; gap: 8px; }
+        nav button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 9px;
+            padding: 11px 19px;
+            background: transparent;
+            color: #7b6c87;
+            font-size: 13px;
+        }
+        nav button:hover { background: #f8f4fe; }
+        nav button.active { background: #eee6fc; color: #6836b3; }
+        .nav-icon { width: 17px; height: 17px; flex-shrink: 0; }
+        .content, .admin-content { padding: 30px 24px 64px; }
+        .card {
+            min-width: 0;
+            padding: 28px;
+            border: 1px solid var(--line);
+            border-radius: 19px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+        }
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin: 26px 0 20px;
+        }
+        .toolbar h2 { margin: 0; font-size: 25px; }
+        .toolbar > button, .toolbar .secondary {
+            color: #76598e;
+            background: white;
+            border-color: var(--line);
+        }
+        .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+        .form-actions { margin-top: 24px; }
+        .section-eyebrow {
+            display: block;
+            margin-bottom: 8px;
+            color: #896c9c;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+        }
+        .page-hero, .events-hero {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            align-items: center;
+            min-height: 235px;
+            padding: 38px 42px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            isolation: isolate;
+            border: 1px solid #7854a6;
+            border-radius: 23px;
+            color: white;
+            background:
+                radial-gradient(circle at 85% 10%, #bf93ff4d, transparent 45%),
+                linear-gradient(120deg, #302047, #7040c8);
+        }
+        .page-hero::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            width: 280px;
+            height: 280px;
+            right: -80px;
+            bottom: -170px;
+            border: 1px solid #ffffff24;
+            border-radius: 50%;
+            box-shadow: 0 0 0 35px #ffffff05, 0 0 0 70px #ffffff04;
+        }
+        .hero-eyebrow {
+            display: block;
+            margin-bottom: 16px;
+            color: #dbc5fa;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+        }
+        .page-hero h2, .events-hero h2 {
+            max-width: 590px;
+            margin: 0;
+            color: white;
+            font-size: clamp(29px, 3.1vw, 40px);
+            line-height: 1.18;
+            letter-spacing: -1.35px;
+        }
+        .page-hero p, .events-hero p {
+            max-width: 470px;
+            margin: 16px 0 0;
+            color: #e3d7f3;
+            font-size: 13px;
+            line-height: 1.9;
+        }
+        .hero-decoration {
+            position: relative;
+            display: grid;
+            place-items: center;
+            align-self: stretch;
+        }
+        .hero-orbit {
+            position: absolute;
+            width: 255px;
+            height: 255px;
+            border: 1px solid #ffffff24;
+            border-radius: 50%;
+            box-shadow: 0 0 0 25px #ffffff05;
+        }
+        .hero-ticket {
+            position: relative;
+            width: 206px;
+            padding: 23px;
+            border: 1px solid #ffffff80;
+            border-radius: 17px;
+            background: #fcf9ff;
+            color: #422559;
+            box-shadow: 12px 18px 30px #1d103c33;
+            transform: rotate(8deg);
+        }
+        .hero-ticket-star { display: block; margin-bottom: 13px; color: #8755dc; font-size: 32px; }
+        .hero-ticket strong { display: block; font-size: 15px; line-height: 1.5; }
+        .hero-ticket > span:not(.hero-ticket-star) {
+            display: block;
+            margin-top: 7px;
+            color: #78648c;
+            font-size: 10px;
+        }
+        .ticket-perforation { margin: 19px -23px 14px; border-top: 2px dashed #dfd3ee; }
+        .hero-ticket .ticket-bottom { font-size: 9px; letter-spacing: 2px; font-weight: 700; }
+        .hero-symbol {
+            position: relative;
+            display: grid;
+            place-items: center;
+            justify-self: center;
+            width: 125px;
+            height: 125px;
+            border: 1px solid #ffffff45;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #ffffff20, #ffffff09);
+            box-shadow: 12px 15px 30px #1d103c15;
+            transform: rotate(8deg);
+        }
+        .hero-symbol svg { width: 61px; height: 61px; color: #f3eaff; transform: rotate(-8deg); }
+        .event-filters {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto auto;
+            align-items: end;
+            gap: 13px;
+            margin-bottom: 24px;
+            padding: 22px;
+        }
+        .event-filters label { margin-top: 0; }
+        .event-filters button { min-height: 48px; }
+        #event-list, #booking-list, .list {
+            display: grid;
+            gap: 22px;
+            align-items: start;
+        }
+        #event-list, #booking-list, #venue-list, #admin-event-list, #hire-list {
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 315px), 1fr));
+        }
+        .event-card, .booking-card,
+        .list > .card {
+            position: relative;
+            overflow: hidden;
+            transition: border-color .18s ease, box-shadow .18s ease;
+        }
+        .event-card::before, .booking-card::before, .list > .card::before {
+            content: "";
+            display: block;
+            height: 5px;
+            margin: -28px -28px 24px;
+            background: linear-gradient(90deg, #7040c8, #ab80e3, #e5d7f7);
+        }
+        .event-card:hover, .booking-card:hover, .list > .card:hover {
+            border-color: #cfb8ec;
+            box-shadow: 0 12px 30px #4527750d;
+        }
+        .event-card h3, .booking-card h3, .list > .card h3 {
+            font-size: 21px;
+            line-height: 1.4;
+        }
+        .event-card p, .booking-card p, .list > .card p { font-size: 13px; }
+        .event-card > button { width: 100%; margin-top: 8px; }
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border: 1px solid #e8dcf9;
+            border-radius: 30px;
+            background: #f2ebfc;
+            color: #7447ac;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge[data-status="approved"], .badge[data-status="published"], .badge[data-status="active"] {
+            color: #256b55; background: #edf8f2; border-color: #d6ecdf;
+        }
+        .badge[data-status="pending"], .badge[data-status="draft"] {
+            color: #89611d; background: #fff8e8; border-color: #f1e5c7;
+        }
+        .badge[data-status="cancelled"], .badge[data-status="rejected"] {
+            color: #a13d58; background: #fff0f4; border-color: #f1d9e2;
+        }
+        .ticket-details {
+            padding: 18px;
+            margin-top: 18px;
+            border: 1px solid #e8dcf8;
+            border-radius: 13px;
+            background: #faf7ff;
+        }
+        .ticket-details button { width: 100%; margin-top: 14px; }
+        .booking-card .actions { margin-top: 18px; }
+        .actions button { font-size: 12px; }
+        .qr-list { margin-top: 18px; }
+        .qr-image { display: block; width: 200px; max-width: 100%; height: auto; }
+        .hire-card, .form-card { max-width: 780px; padding: 32px; }
+        .form-card { margin-bottom: 26px; }
+        .hire-card > h3, .form-card > h3, .overview-card > h3 {
+            padding-bottom: 16px;
+            border-bottom: 1px solid #eee7f5;
+        }
+        .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+        .field-grid .field-wide { grid-column: 1 / -1; }
+        .checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 11px;
+            background: #fcfaff;
+        }
+        .checkbox input { width: 17px; min-height: auto; height: 17px; margin: 0; accent-color: var(--purple); }
+        .venue-photo, #photo-preview {
+            display: block;
+            width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            margin: 18px 0;
+        }
+        .notifications-card { margin-top: 28px; }
+        .notification-item {
+            padding: 18px 20px;
+            margin-top: 16px;
+            border: 1px solid #e7dcf4;
+            border-left: 3px solid #9872cc;
+            border-radius: 12px;
+            background: #f8f4fe;
+        }
+        .notification-item p { margin: 0; font-size: 13px; }
+        [role="status"]:empty { display: none; }
+        .overview-card { padding: 32px; }
+        #summary-results {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 26px;
+        }
+        .summary-item {
+            margin: 0;
+            padding: 23px;
+            min-width: 0;
+            border: 1px solid #e8def5;
+            border-radius: 14px;
+            background: linear-gradient(145deg, #faf7ff, #f2eafb);
+        }
+        .summary-item span { display: block; color: #79638d; font-size: 12px; }
+        .summary-item strong {
+            display: block;
+            margin-top: 13px;
+            color: #5d3591;
+            font-size: clamp(23px, 2.5vw, 31px);
+            letter-spacing: -1px;
+            overflow-wrap: anywhere;
+        }
+        .panel-note { margin: 0 0 8px; color: #82708f; font-size: 13px; }
+        .workspace-footer { margin-top: 35px; text-align: center; color: #8a7a97; font-size: 11px; }
+        .scanner-layout { display: grid; grid-template-columns: 1.15fr 1fr; gap: 24px; align-items: start; }
+        .scanner-panel, .entry-panel { padding: 28px; }
+        .panel-step { display: flex; gap: 11px; align-items: center; margin-bottom: 14px; }
+        .step-number {
+            display: grid; place-items: center; width: 31px; height: 31px;
+            border-radius: 10px; background: var(--soft); color: #7249a6;
+            font-size: 12px; font-weight: 700; flex-shrink: 0;
+        }
+        .panel-step h3 { margin: 0; font-size: 19px; }
+        #reader { margin: 20px 0 12px; border-radius: 14px; overflow: hidden; background: #fdfbff; }
+        #reader video, #reader img { max-width: 100%; }
+        #reader button { font-size: 12px; max-width: 100%; }
+        #reader a { color: #7040c8; font-size: 13px; }
+        #reader input { max-width: 100%; }
+        #check-button { width: 100%; margin-top: 6px; }
+        #result:not(:empty) {
+            padding: 15px; border: 1px solid var(--line); border-radius: 11px;
+            background: #faf7ff; font-size: 13px; font-weight: 600;
+        }
+        .scanner-help {
+            margin-top: 22px; padding-top: 19px; border-top: 1px solid var(--line);
+            color: #85728f; font-size: 12px; line-height: 1.8;
+        }
+        @media (max-width: 850px) {
+            .event-filters { grid-template-columns: 1fr 1fr; }
+            #summary-results { grid-template-columns: 1fr 1fr; }
+            .page-hero, .events-hero { grid-template-columns: 1.6fr 1fr; padding: 32px; }
+            .hero-ticket { width: 180px; padding: 20px; }
+            .scanner-layout { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            header, .navigation { padding: 16px; }
+            .header-content { gap: 12px; }
+            .brand { gap: 10px; }
+            .logo { width: 39px; height: 39px; border-radius: 11px; font-size: 22px; }
+            header h1 { font-size: 20px; }
+            header p { max-width: 190px; font-size: 11px; }
+            .brand-role { display: none; }
+            .signout-form button { padding: 9px 12px; font-size: 11px; }
+            .content, .admin-content { padding: 20px 16px 40px; }
+            nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+            .admin-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            nav button { flex-direction: column; gap: 6px; padding: 10px 5px; font-size: 11px; }
+            .card, .hire-card, .form-card, .overview-card { padding: 22px; }
+            .event-card::before, .booking-card::before, .list > .card::before { margin: -22px -22px 22px; }
+            .page-hero, .events-hero {
+                min-height: auto; grid-template-columns: 1fr; padding: 28px;
+                margin-bottom: 24px; border-radius: 19px;
+            }
+            .page-hero h2, .events-hero h2 { font-size: 31px; }
+            .page-hero p, .events-hero p { font-size: 12px; }
+            .hero-decoration, .hero-symbol { display: none; }
+            .hero-eyebrow { font-size: 9px; }
+            .toolbar { margin-top: 20px; gap: 13px; }
+            .toolbar h2 { font-size: 23px; }
+            .toolbar .actions { flex-wrap: wrap; }
+            #event-list, #booking-list, #venue-list, #admin-event-list, #hire-list { grid-template-columns: minmax(0, 1fr); }
+            .event-filters, .field-grid { grid-template-columns: minmax(0, 1fr); }
+            .event-filters { gap: 15px; }
+            .summary-item { padding: 17px; }
+            .summary-item strong { font-size: 23px; }
+            #summary-results { gap: 10px; }
+            .actions button { flex: 1; }
+        }
+        @media (max-width: 360px) {
+            .header-content { flex-wrap: wrap; }
+            .signout-form { margin-left: auto; }
+            #summary-results { grid-template-columns: 1fr; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+        }
+
+    </style>
 </head>
 <body>
-    <h1>Ticket check-in</h1>
+    <header>
+        <div class="header-content">
+            <div class="brand">
+                <div class="logo" aria-hidden="true">E</div>
+                <div>
+                    <h1>EventSphere <span class="brand-role">STAFF</span></h1>
+                    <p>A warm welcome starts at the gate.</p>
+                </div>
+            </div>
+            <form action="/logout" method="post" class="signout-form">
+                <button type="submit">Sign out</button>
+            </form>
+        </div>
+    </header>
+    <div class="navigation">
+        <nav aria-label="Staff workspace">
+            <button type="button" class="active" aria-current="page">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5M8 8h3v3H8zM15 8h2v3h-2zM8 15h3v2H8zM15 15h2v2h-2z"/></svg><span>Gate check-in</span>
+            </button>
+        </nav>
+    </div>
+    <main class="content">
 
-    <form id="check-in">
-        <p><label>Event ID <input id="event-id" type="number" min="1" required></label></p>
-        <p><label>Ticket code <input id="ticket-code" required></label></p>
-        <button type="submit">Check in</button>
-    </form>
+            <div class="page-hero">
+                <div>
+                    <span class="hero-eyebrow">WELCOME THEM IN</span>
+                    <h2>A smooth start to every event.</h2>
+                    <p>Scan a ticket, confirm the event and make every arrival feel effortless.</p>
+                </div>
+                <div class="hero-symbol" aria-hidden="true"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5M8 8h3v3H8zM15 8h2v3h-2zM8 15h3v2H8zM15 15h2v2h-2z"/></svg></div>
+            </div>
 
-    <p id="result" role="status"></p>
+        <div class="scanner-layout">
+            <section class="card scanner-panel">
+                <div class="panel-step">
+                    <span class="step-number">01</span>
+                    <h3>Scan a ticket</h3>
+                </div>
+                <p>Use your camera or choose a QR image from your device.</p>
+                <div id="reader"></div>
+                <p id="camera-message" role="status"></p>
+                <div class="scanner-help">
+                    No camera available? Enter the ticket code in the check-in form.
+                </div>
+            </section>
+            <section class="card entry-panel">
+                <div class="panel-step">
+                    <span class="step-number">02</span>
+                    <h3>Confirm &amp; check in</h3>
+                </div>
+                <p>Check the event ID before admitting the attendee.</p>
+                <form id="check-in">
+                    <label for="event-id">Event ID</label>
+                    <input id="event-id" type="number" min="1" step="1"
+                           placeholder="Enter the event ID" required>
+                    <label for="ticket-code">Ticket code</label>
+                    <input id="ticket-code" autocomplete="off"
+                           placeholder="Scan or paste a ticket code" required>
+                    <div class="form-actions">
+                        <button id="check-button" type="submit">Check in attendee</button>
+                    </div>
+                </form>
+                <p id="result" role="status"></p>
+                <div class="scanner-help">
+                    Each ticket can be used once. Check-in opens 30 minutes
+                    before the event and closes at its end time.
+                </div>
+            </section>
+        </div>
+        <p class="workspace-footer">EventSphere · Staff workspace</p>
+    </main>
 
     <script>
-        document.getElementById("check-in").onsubmit = async function (event) {
+        // All three pages share CSRF-protected writes and normal sign-out forms.
+        (() => {
+            const nativeFetch = window.fetch.bind(window);
+            let tokenPromise;
+            async function token() {
+                if (!tokenPromise) {
+                    tokenPromise = nativeFetch('/csrf', {credentials: 'same-origin'})
+                        .then(response => {
+                            if (!response.ok) throw new Error('Unable to prepare a secure request.');
+                            return response.json();
+                        }).then(data => data.csrf_token)
+                        .catch(error => { tokenPromise = null; throw error; });
+                }
+                return tokenPromise;
+            }
+            window.fetch = async function (input, options = {}) {
+                const url = new URL(input instanceof Request ? input.url : input, location.href);
+                const method = (options.method || (input instanceof Request ? input.method : 'GET')).toUpperCase();
+                if (url.origin === location.origin && ['POST','PUT','PATCH','DELETE'].includes(method)) {
+                    const headers = new Headers(options.headers || (input instanceof Request ? input.headers : undefined));
+                    headers.set('X-CSRF-Token', await token());
+                    options = {...options, headers};
+                }
+                return nativeFetch(input, options);
+            };
+            document.addEventListener('submit', async event => {
+                const form = event.target;
+                if (!(form instanceof HTMLFormElement) || new URL(form.action).pathname !== '/logout') return;
+                event.preventDefault();
+                const button = form.querySelector('button');
+                button.disabled = true;
+                try {
+                    const response = await fetch('/logout', {method: 'POST'});
+                    if (!response.ok) throw new Error('Sign out failed. Please refresh and retry.');
+                    location.replace('/');
+                } catch (error) {
+                    button.disabled = false;
+                    alert(error.message);
+                }
+            }, true);
+        })();
+    </script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script>
+
+        const form = document.getElementById("check-in");
+        const codeInput = document.getElementById("ticket-code");
+        const result = document.getElementById("result");
+        const button = document.getElementById("check-button");
+        const cameraMessage = document.getElementById("camera-message");
+
+        // Scan a QR code and fill the ticket code field.
+        if (typeof Html5QrcodeScanner !== "undefined") {
+            try {
+                const scanner = new Html5QrcodeScanner(
+                    "reader", {fps: 10}, false
+                );
+                scanner.render(function (code) {
+                    codeInput.value = code;
+                    cameraMessage.textContent =
+                        "QR code read. Check the event ID, then click Check in.";
+                });
+            } catch {
+                cameraMessage.textContent =
+                    "Camera scanner unavailable. Enter the ticket code manually.";
+            }
+        } else {
+            cameraMessage.textContent =
+                "Scanner library could not load. Enter the ticket code manually.";
+        }
+
+        // Submit the ticket for check-in.
+        form.onsubmit = async function (event) {
             event.preventDefault();
-
-            const response = await fetch("/check-in", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    event_id: Number(document.getElementById("event-id").value),
-                    code: document.getElementById("ticket-code").value.trim()
-                })
-            });
-
-            const data = await response.json();
-            document.getElementById("result").textContent =
-                data.message || data.detail;
+            const code = codeInput.value.trim();
+            if (!code) {
+                result.style.color = "#b42335";
+                result.textContent = "Enter or scan a ticket code.";
+                return;
+            }
+            button.disabled = true;
+            result.style.color = "#746980";
+            result.textContent = "Checking ticket…";
+            try {
+                const response = await fetch("/check-in", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        event_id: Number(document.getElementById("event-id").value),
+                        code: code
+                    })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    result.style.color = "#24734a";
+                    result.textContent = data.message;
+                    codeInput.value = "";
+                } else {
+                    result.style.color = "#b42335";
+                    result.textContent = typeof data.detail === "string"
+                        ? data.detail : "Check the event ID and ticket code.";
+                }
+            } catch {
+                result.style.color = "#b42335";
+                result.textContent =
+                    "Connection lost. The check-in result is unknown. Try the code again.";
+            } finally {
+                button.disabled = false;
+            }
         };
     </script>
 </body>

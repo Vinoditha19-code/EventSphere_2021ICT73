@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>EventSphere | Admin</title>
+
+    <style>
+
+        :root {
+            --purple: #7040c8;
+            --purple-dark: #54309a;
+            --ink: #2b1c3f;
+            --muted: #776883;
+            --line: #e9e1f2;
+            --surface: #ffffff;
+            --background: #f8f6fc;
+            --soft: #f2ebfc;
+            --shadow: 0 8px 30px rgba(55, 26, 91, 0.045);
+        }
+
+        * { box-sizing: border-box; }
+        [hidden] { display: none !important; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", sans-serif;
+            color: var(--ink);
+            background: var(--background);
+        }
+        button, input, textarea, select { font: inherit; }
+        button {
+            min-height: 44px;
+            padding: 12px 19px;
+            border: 1px solid transparent;
+            border-radius: 11px;
+            background: var(--purple);
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .18s ease, box-shadow .18s ease;
+        }
+        button:hover { background: var(--purple-dark); }
+        button:disabled { opacity: .55; cursor: default; }
+        button:focus-visible, input:focus-visible,
+        textarea:focus-visible, select:focus-visible {
+            outline: 3px solid #cbb5f3;
+            outline-offset: 3px;
+        }
+        .secondary {
+            background: var(--soft);
+            color: #6338a2;
+        }
+        .secondary:hover { background: #e7d9f8; }
+        .danger { color: #b12f49; background: #fff0f3; }
+        .danger:hover { background: #fbdfe6; }
+        h1, h2, h3 { overflow-wrap: anywhere; }
+        h1 { margin: 0; font-size: 23px; letter-spacing: -.8px; }
+        h2 { margin: 0 0 12px; font-size: 27px; letter-spacing: -.9px; }
+        h3 { margin: 0 0 14px; font-size: 21px; letter-spacing: -.5px; }
+        p {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.75;
+            overflow-wrap: anywhere;
+        }
+        label {
+            display: block;
+            margin: 18px 0 9px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #594767;
+        }
+        input, select, textarea {
+            width: 100%;
+            min-width: 0;
+            min-height: 48px;
+            padding: 13px 14px;
+            border: 1px solid #e3d9ed;
+            border-radius: 11px;
+            color: var(--ink);
+            background: #fcfbfe;
+            font-size: 14px;
+            transition: border-color .18s ease, box-shadow .18s ease;
+        }
+        input::placeholder, textarea::placeholder { color: #978b9f; }
+        input:focus, select:focus, textarea:focus {
+            border-color: #a57cd9;
+            box-shadow: 0 0 0 3px #f1e9fc;
+        }
+        textarea { min-height: 115px; resize: vertical; }
+        input[type="file"]::file-selector-button {
+            padding: 9px 13px;
+            margin-right: 12px;
+            border: 0;
+            border-radius: 7px;
+            background: #eee5fc;
+            color: #6338a2;
+            cursor: pointer;
+        }
+        header {
+            padding: 24px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--line);
+        }
+        .header-content, nav, .content, .admin-content {
+            width: 100%;
+            max-width: 1180px;
+            margin: auto;
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        .brand { display: flex; align-items: center; gap: 13px; min-width: 0; }
+        .logo {
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: linear-gradient(145deg, #8755dc, #5d2cac);
+            box-shadow: 0 6px 16px #7040c824;
+            color: white;
+            font-size: 25px;
+            font-weight: 700;
+        }
+        header p { margin: 4px 0 0; font-size: 12px; }
+        .brand-role {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 4px 7px;
+            border-radius: 6px;
+            vertical-align: middle;
+            background: #f2ebfc;
+            color: #79539d;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .signout-form { margin: 0; flex-shrink: 0; }
+        .signout-form button {
+            min-height: 40px;
+            white-space: nowrap;
+            border: 1px solid var(--line);
+            background: white;
+            color: #715783;
+            font-size: 12px;
+        }
+        .signout-form button:hover { background: var(--soft); }
+        .navigation {
+            padding: 12px 24px;
+            background: white;
+            border-bottom: 1px solid var(--line);
+        }
+        nav { display: flex; flex-wrap: wrap; gap: 8px; }
+        nav button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 9px;
+            padding: 11px 19px;
+            background: transparent;
+            color: #7b6c87;
+            font-size: 13px;
+        }
+        nav button:hover { background: #f8f4fe; }
+        nav button.active { background: #eee6fc; color: #6836b3; }
+        .nav-icon { width: 17px; height: 17px; flex-shrink: 0; }
+        .content, .admin-content { padding: 30px 24px 64px; }
+        .card {
+            min-width: 0;
+            padding: 28px;
+            border: 1px solid var(--line);
+            border-radius: 19px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+        }
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin: 26px 0 20px;
+        }
+        .toolbar h2 { margin: 0; font-size: 25px; }
+        .toolbar > button, .toolbar .secondary {
+            color: #76598e;
+            background: white;
+            border-color: var(--line);
+        }
+        .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+        .form-actions { margin-top: 24px; }
+        .section-eyebrow {
+            display: block;
+            margin-bottom: 8px;
+            color: #896c9c;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+        }
+        .page-hero, .events-hero {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            align-items: center;
+            min-height: 235px;
+            padding: 38px 42px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            isolation: isolate;
+            border: 1px solid #7854a6;
+            border-radius: 23px;
+            color: white;
+            background:
+                radial-gradient(circle at 85% 10%, #bf93ff4d, transparent 45%),
+                linear-gradient(120deg, #302047, #7040c8);
+        }
+        .page-hero::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            width: 280px;
+            height: 280px;
+            right: -80px;
+            bottom: -170px;
+            border: 1px solid #ffffff24;
+            border-radius: 50%;
+            box-shadow: 0 0 0 35px #ffffff05, 0 0 0 70px #ffffff04;
+        }
+        .hero-eyebrow {
+            display: block;
+            margin-bottom: 16px;
+            color: #dbc5fa;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+        }
+        .page-hero h2, .events-hero h2 {
+            max-width: 590px;
+            margin: 0;
+            color: white;
+            font-size: clamp(29px, 3.1vw, 40px);
+            line-height: 1.18;
+            letter-spacing: -1.35px;
+        }
+        .page-hero p, .events-hero p {
+            max-width: 470px;
+            margin: 16px 0 0;
+            color: #e3d7f3;
+            font-size: 13px;
+            line-height: 1.9;
+        }
+        .hero-decoration {
+            position: relative;
+            display: grid;
+            place-items: center;
+            align-self: stretch;
+        }
+        .hero-orbit {
+            position: absolute;
+            width: 255px;
+            height: 255px;
+            border: 1px solid #ffffff24;
+            border-radius: 50%;
+            box-shadow: 0 0 0 25px #ffffff05;
+        }
+        .hero-ticket {
+            position: relative;
+            width: 206px;
+            padding: 23px;
+            border: 1px solid #ffffff80;
+            border-radius: 17px;
+            background: #fcf9ff;
+            color: #422559;
+            box-shadow: 12px 18px 30px #1d103c33;
+            transform: rotate(8deg);
+        }
+        .hero-ticket-star { display: block; margin-bottom: 13px; color: #8755dc; font-size: 32px; }
+        .hero-ticket strong { display: block; font-size: 15px; line-height: 1.5; }
+        .hero-ticket > span:not(.hero-ticket-star) {
+            display: block;
+            margin-top: 7px;
+            color: #78648c;
+            font-size: 10px;
+        }
+        .ticket-perforation { margin: 19px -23px 14px; border-top: 2px dashed #dfd3ee; }
+        .hero-ticket .ticket-bottom { font-size: 9px; letter-spacing: 2px; font-weight: 700; }
+        .hero-symbol {
+            position: relative;
+            display: grid;
+            place-items: center;
+            justify-self: center;
+            width: 125px;
+            height: 125px;
+            border: 1px solid #ffffff45;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #ffffff20, #ffffff09);
+            box-shadow: 12px 15px 30px #1d103c15;
+            transform: rotate(8deg);
+        }
+        .hero-symbol svg { width: 61px; height: 61px; color: #f3eaff; transform: rotate(-8deg); }
+        .event-filters {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto auto;
+            align-items: end;
+            gap: 13px;
+            margin-bottom: 24px;
+            padding: 22px;
+        }
+        .event-filters label { margin-top: 0; }
+        .event-filters button { min-height: 48px; }
+        #event-list, #booking-list, .list {
+            display: grid;
+            gap: 22px;
+            align-items: start;
+        }
+        #event-list, #booking-list, #venue-list, #admin-event-list, #hire-list {
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 315px), 1fr));
+        }
+        .event-card, .booking-card,
+        .list > .card {
+            position: relative;
+            overflow: hidden;
+            transition: border-color .18s ease, box-shadow .18s ease;
+        }
+        .event-card::before, .booking-card::before, .list > .card::before {
+            content: "";
+            display: block;
+            height: 5px;
+            margin: -28px -28px 24px;
+            background: linear-gradient(90deg, #7040c8, #ab80e3, #e5d7f7);
+        }
+        .event-card:hover, .booking-card:hover, .list > .card:hover {
+            border-color: #cfb8ec;
+            box-shadow: 0 12px 30px #4527750d;
+        }
+        .event-card h3, .booking-card h3, .list > .card h3 {
+            font-size: 21px;
+            line-height: 1.4;
+        }
+        .event-card p, .booking-card p, .list > .card p { font-size: 13px; }
+        .event-card > button { width: 100%; margin-top: 8px; }
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border: 1px solid #e8dcf9;
+            border-radius: 30px;
+            background: #f2ebfc;
+            color: #7447ac;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge[data-status="approved"], .badge[data-status="published"], .badge[data-status="active"] {
+            color: #256b55; background: #edf8f2; border-color: #d6ecdf;
+        }
+        .badge[data-status="pending"], .badge[data-status="draft"] {
+            color: #89611d; background: #fff8e8; border-color: #f1e5c7;
+        }
+        .badge[data-status="cancelled"], .badge[data-status="rejected"] {
+            color: #a13d58; background: #fff0f4; border-color: #f1d9e2;
+        }
+        .ticket-details {
+            padding: 18px;
+            margin-top: 18px;
+            border: 1px solid #e8dcf8;
+            border-radius: 13px;
+            background: #faf7ff;
+        }
+        .ticket-details button { width: 100%; margin-top: 14px; }
+        .booking-card .actions { margin-top: 18px; }
+        .actions button { font-size: 12px; }
+        .qr-list { margin-top: 18px; }
+        .qr-image { display: block; width: 200px; max-width: 100%; height: auto; }
+        .hire-card, .form-card { max-width: 780px; padding: 32px; }
+        .form-card { margin-bottom: 26px; }
+        .hire-card > h3, .form-card > h3, .overview-card > h3 {
+            padding-bottom: 16px;
+            border-bottom: 1px solid #eee7f5;
+        }
+        .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+        .field-grid .field-wide { grid-column: 1 / -1; }
+        .checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 11px;
+            background: #fcfaff;
+        }
+        .checkbox input { width: 17px; min-height: auto; height: 17px; margin: 0; accent-color: var(--purple); }
+        .venue-photo, #photo-preview {
+            display: block;
+            width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            margin: 18px 0;
+        }
+        .notifications-card { margin-top: 28px; }
+        .notification-item {
+            padding: 18px 20px;
+            margin-top: 16px;
+            border: 1px solid #e7dcf4;
+            border-left: 3px solid #9872cc;
+            border-radius: 12px;
+            background: #f8f4fe;
+        }
+        .notification-item p { margin: 0; font-size: 13px; }
+        [role="status"]:empty { display: none; }
+        .overview-card { padding: 32px; }
+        #summary-results {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 26px;
+        }
+        .summary-item {
+            margin: 0;
+            padding: 23px;
+            min-width: 0;
+            border: 1px solid #e8def5;
+            border-radius: 14px;
+            background: linear-gradient(145deg, #faf7ff, #f2eafb);
+        }
+        .summary-item span { display: block; color: #79638d; font-size: 12px; }
+        .summary-item strong {
+            display: block;
+            margin-top: 13px;
+            color: #5d3591;
+            font-size: clamp(23px, 2.5vw, 31px);
+            letter-spacing: -1px;
+            overflow-wrap: anywhere;
+        }
+        .panel-note { margin: 0 0 8px; color: #82708f; font-size: 13px; }
+        .workspace-footer { margin-top: 35px; text-align: center; color: #8a7a97; font-size: 11px; }
+        .scanner-layout { display: grid; grid-template-columns: 1.15fr 1fr; gap: 24px; align-items: start; }
+        .scanner-panel, .entry-panel { padding: 28px; }
+        .panel-step { display: flex; gap: 11px; align-items: center; margin-bottom: 14px; }
+        .step-number {
+            display: grid; place-items: center; width: 31px; height: 31px;
+            border-radius: 10px; background: var(--soft); color: #7249a6;
+            font-size: 12px; font-weight: 700; flex-shrink: 0;
+        }
+        .panel-step h3 { margin: 0; font-size: 19px; }
+        #reader { margin: 20px 0 12px; border-radius: 14px; overflow: hidden; background: #fdfbff; }
+        #reader video, #reader img { max-width: 100%; }
+        #reader button { font-size: 12px; max-width: 100%; }
+        #reader a { color: #7040c8; font-size: 13px; }
+        #reader input { max-width: 100%; }
+        #check-button { width: 100%; margin-top: 6px; }
+        #result:not(:empty) {
+            padding: 15px; border: 1px solid var(--line); border-radius: 11px;
+            background: #faf7ff; font-size: 13px; font-weight: 600;
+        }
+        .scanner-help {
+            margin-top: 22px; padding-top: 19px; border-top: 1px solid var(--line);
+            color: #85728f; font-size: 12px; line-height: 1.8;
+        }
+        @media (max-width: 850px) {
+            .event-filters { grid-template-columns: 1fr 1fr; }
+            #summary-results { grid-template-columns: 1fr 1fr; }
+            .page-hero, .events-hero { grid-template-columns: 1.6fr 1fr; padding: 32px; }
+            .hero-ticket { width: 180px; padding: 20px; }
+            .scanner-layout { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            header, .navigation { padding: 16px; }
+            .header-content { gap: 12px; }
+            .brand { gap: 10px; }
+            .logo { width: 39px; height: 39px; border-radius: 11px; font-size: 22px; }
+            header h1 { font-size: 20px; }
+            header p { max-width: 190px; font-size: 11px; }
+            .brand-role { display: none; }
+            .signout-form button { padding: 9px 12px; font-size: 11px; }
+            .content, .admin-content { padding: 20px 16px 40px; }
+            nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+            .admin-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            nav button { flex-direction: column; gap: 6px; padding: 10px 5px; font-size: 11px; }
+            .card, .hire-card, .form-card, .overview-card { padding: 22px; }
+            .event-card::before, .booking-card::before, .list > .card::before { margin: -22px -22px 22px; }
+            .page-hero, .events-hero {
+                min-height: auto; grid-template-columns: 1fr; padding: 28px;
+                margin-bottom: 24px; border-radius: 19px;
+            }
+            .page-hero h2, .events-hero h2 { font-size: 31px; }
+            .page-hero p, .events-hero p { font-size: 12px; }
+            .hero-decoration, .hero-symbol { display: none; }
+            .hero-eyebrow { font-size: 9px; }
+            .toolbar { margin-top: 20px; gap: 13px; }
+            .toolbar h2 { font-size: 23px; }
+            .toolbar .actions { flex-wrap: wrap; }
+            #event-list, #booking-list, #venue-list, #admin-event-list, #hire-list { grid-template-columns: minmax(0, 1fr); }
+            .event-filters, .field-grid { grid-template-columns: minmax(0, 1fr); }
+            .event-filters { gap: 15px; }
+            .summary-item { padding: 17px; }
+            .summary-item strong { font-size: 23px; }
+            #summary-results { gap: 10px; }
+            .actions button { flex: 1; }
+        }
+        @media (max-width: 360px) {
+            .header-content { flex-wrap: wrap; }
+            .signout-form { margin-left: auto; }
+            #summary-results { grid-template-columns: 1fr; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+        }
+
+
+        /* Related fields share a row on larger screens. */
+        .editor-form {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 0 20px;
+        }
+        .form-field { min-width: 0; }
+        .form-field.field-wide,
+        .editor-form > p,
+        .editor-form > img,
+        .editor-form > .actions,
+        .editor-form > .form-actions,
+        .editor-form > .checkbox,
+        .editor-form > button {
+            grid-column: 1 / -1;
+        }
+        @media (max-width: 600px) {
+            .editor-form { grid-template-columns: minmax(0, 1fr); }
+        }
+    </style>
+</head>
+
+<body>
+        <header>
+        <div class="header-content">
+            <div class="brand">
+                <div class="logo" aria-hidden="true">E</div>
+                <div>
+                    <h1>EventSphere <span class="brand-role">ADMIN</span></h1>
+                    <p>Your campus, thoughtfully managed.</p>
+                </div>
+            </div>
+            <form action="/logout" method="post" class="signout-form">
+                <button type="submit">Sign out</button>
+            </form>
+        </div>
+    </header>
+
+    <div class="navigation">
+        <nav class="admin-nav" aria-label="Admin navigation">
+            <button type="button" data-page="dashboard"
+                    class="active" aria-current="page"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="8" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="15" width="7" height="6" rx="1"/></svg><span>Dashboard</span></button>
+
+            <button type="button" data-page="venues"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M10 21v-6h4v6"/></svg><span>Venues</span></button>
+
+            <button type="button" data-page="events"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4M17 3v4M3 11h18M7 15h3M14 15h3"/></svg><span>Events</span></button>
+
+            <button type="button" data-page="hires"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 10h6M9 14h3M9 18h6"/></svg><span>Hire requests</span></button>
+            <button type="button" data-page="agents">Agent activity</button>
+        </nav>
+    </div>
+
+    <main class="admin-content">
+        <!-- Dashboard -->
+        <section id="dashboard-page" class="page">
+            <div class="page-hero">
+                <div>
+                    <span class="hero-eyebrow">YOUR CAMPUS AT A GLANCE</span>
+                    <h2>Every event. A clearer picture.</h2>
+                    <p>Follow ticket sales, revenue and arrivals—all from one place.</p>
+                </div>
+                <div class="hero-symbol" aria-hidden="true"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="8" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="15" width="7" height="6" rx="1"/></svg></div>
+            </div>
+
+            <div class="toolbar">
+                <h2>Dashboard</h2>
+            </div>
+
+            <div class="card overview-card">
+                <h3>Event overview</h3>
+                <p>Select an event to view its sales and check-ins.</p>
+
+                <form id="summary-form">
+                    <label for="summary-event">Event</label>
+                    <select id="summary-event" required>
+                        <option value="">Loading events…</option>
+                    </select>
+
+                    <div class="actions form-actions">
+                        <button id="summary-button" type="submit">
+                            Show summary
+                        </button>
+
+                        <button id="refresh-dashboard" type="button"
+                                class="secondary">
+                            Refresh event list
+                        </button>
+                    </div>
+                </form>
+
+                <p id="summary-message" role="status"></p>
+                <div id="summary-results"></div>
+            </div>
+        </section>
+
+        <!-- Venues -->
+        <section id="venues-page" class="page" hidden>
+            <div class="page-hero">
+                <div>
+                    <span class="hero-eyebrow">SPACES WITH POSSIBILITIES</span>
+                    <h2>The right space starts here.</h2>
+                    <p>Keep venue details, photographs and hire availability ready for your community.</p>
+                </div>
+                <div class="hero-symbol" aria-hidden="true"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M10 21v-6h4v6"/></svg></div>
+            </div>
+
+            <div class="toolbar">
+                <h2>Venues</h2>
+
+                <div class="actions">
+                    <button id="add-venue" type="button">
+                        Add venue
+                    </button>
+
+                    <button id="load-venues" type="button"
+                            class="secondary">
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <section id="venue-editor" class="card form-card" hidden>
+                <h3 id="form-title">Add a venue</h3>
+
+                <form id="venue-form" class="editor-form">
+                    <div class="form-field field-wide">
+<label for="name">Venue name</label>
+<input id="name" required>
+</div>
+
+                    <div class="form-field">
+<label for="location">Location</label>
+<input id="location" required>
+</div>
+
+                    <div class="form-field">
+<label for="capacity">Capacity</label>
+<input id="capacity" type="number"
+                           min="1" step="1" required>
+</div>
+
+                    <div class="form-field field-wide">
+<label for="description">Description</label>
+<textarea id="description" required></textarea>
+</div>
+
+                    <div class="form-field field-wide">
+<label for="image">
+                        Venue photo — JPG or PNG, under 5 MB
+                    </label>
+<input id="image" type="file"
+                           accept="image/jpeg,image/png" required>
+</div>
+
+                    <p id="photo-help">Choose a photo for the new venue.</p>
+
+                    <img id="photo-preview" class="venue-photo"
+                         alt="Current venue photo" hidden>
+
+                    <div class="form-field">
+<label for="rate">Hourly hire rate (Rs.)</label>
+<input id="rate" type="number"
+                           min="0" step="0.01" required>
+</div>
+
+                    <label class="checkbox" for="hire">
+                        <input id="hire" type="checkbox">
+                        Available for private hire
+                    </label>
+
+                    <div class="actions form-actions">
+                        <button id="save-button" type="submit">
+                            Save venue
+                        </button>
+
+                        <button id="cancel-edit" type="button"
+                                class="secondary">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <p id="result" role="status"></p>
+            <p id="venues-message" role="status"></p>
+            <div id="venue-list" class="list"></div>
+        </section>
+
+        <!-- Events -->
+        <section id="events-page" class="page" hidden>
+            <div class="page-hero">
+                <div>
+                    <span class="hero-eyebrow">BRING YOUR CAMPUS TOGETHER</span>
+                    <h2>Turn a good idea into an event.</h2>
+                    <p>Create a draft, publish when you’re ready and manage every event from one place.</p>
+                </div>
+                <div class="hero-symbol" aria-hidden="true"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4M17 3v4M3 11h18M7 15h3M14 15h3"/></svg></div>
+            </div>
+
+            <div class="toolbar">
+                <h2>Events</h2>
+
+                <div class="actions">
+                    <button id="add-event" type="button">
+                        Create event
+                    </button>
+
+                    <button id="load-events" type="button"
+                            class="secondary">
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <section id="event-editor" class="card form-card" hidden>
+                <h3>Create an event</h3>
+
+                <form id="event-form" class="editor-form">
+                    <div class="form-field field-wide">
+<label for="event-title">Event title</label>
+<input id="event-title" required>
+</div>
+
+                    <div class="form-field">
+<label for="event-category">Category</label>
+<input id="event-category"
+                           placeholder="Workshop" required>
+</div>
+
+                    <div class="form-field">
+<label for="event-venue">Venue</label>
+<select id="event-venue" required>
+                        <option value="">Choose a venue</option>
+                    </select>
+</div>
+
+                    <div class="form-field">
+<label for="event-start">Start date and time</label>
+<input id="event-start"
+                           type="datetime-local" required>
+</div>
+
+                    <div class="form-field">
+<label for="event-end">End date and time</label>
+<input id="event-end"
+                           type="datetime-local" required>
+</div>
+
+                    <div class="form-field field-wide">
+<label for="event-description">Description</label>
+<textarea id="event-description" required></textarea>
+</div>
+
+                    <div class="form-field">
+<label for="ticket-name">Ticket category</label>
+<input id="ticket-name"
+                           placeholder="General" required>
+</div>
+
+                    <div class="form-field">
+<label for="ticket-price">Ticket price (Rs.)</label>
+<input id="ticket-price" type="number"
+                           min="0" step="0.01" required>
+</div>
+
+                    <div class="form-field">
+<label for="ticket-quantity">Number of tickets</label>
+<input id="ticket-quantity" type="number"
+                           min="1" step="1" required>
+</div>
+
+                    <div class="actions form-actions">
+                        <button id="create-event-button" type="submit">
+                            Save draft
+                        </button>
+
+                        <button id="cancel-event-form" type="button"
+                                class="secondary">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <p id="event-result" role="status"></p>
+            <p id="events-message" role="status"></p>
+            <div id="admin-event-list" class="list"></div>
+        </section>
+
+        <!-- Hire requests -->
+        <section id="hires-page" class="page" hidden>
+            <div class="page-hero">
+                <div>
+                    <span class="hero-eyebrow">GOOD PLANS NEED GREAT SPACES</span>
+                    <h2>Keep your spaces moving.</h2>
+                    <p>Review private hire requests and help your community find room for its next occasion.</p>
+                </div>
+                <div class="hero-symbol" aria-hidden="true"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 10h6M9 14h3M9 18h6"/></svg></div>
+            </div>
+
+            <div class="toolbar">
+                <h2>Hire requests</h2>
+
+                <button id="load-hires" type="button"
+                        class="secondary">
+                    Refresh
+                </button>
+            </div>
+
+            <p id="hires-message" role="status"></p>
+            <div id="hire-list" class="list"></div>
+        </section>
+
+        <section id="agents-page" class="page" hidden>
+            <div class="toolbar"><h2>Agent activity</h2>
+                <button id="refresh-agent-log" type="button" class="secondary">Refresh messages</button>
+            </div>
+            <section class="card">
+                <h3>Persistent agent state</h3><div id="agent-state-list"></div>
+            </section>
+            <section class="card notifications-card">
+                <h3>Conversation log</h3>
+                <label for="conversation-filter">Conversation ID</label>
+                <input id="conversation-filter" placeholder="Paste a conversation ID to filter">
+                <p id="agent-log-message" role="status"></p>
+                <div id="agent-message-list"></div>
+            </section>
+        </section>
+    </main>
+
+
+    <script>
+        // All three pages share CSRF-protected writes and normal sign-out forms.
+        (() => {
+            const nativeFetch = window.fetch.bind(window);
+            let tokenPromise;
+            async function token() {
+                if (!tokenPromise) {
+                    tokenPromise = nativeFetch('/csrf', {credentials: 'same-origin'})
+                        .then(response => {
+                            if (!response.ok) throw new Error('Unable to prepare a secure request.');
+                            return response.json();
+                        }).then(data => data.csrf_token)
+                        .catch(error => { tokenPromise = null; throw error; });
+                }
+                return tokenPromise;
+            }
+            window.fetch = async function (input, options = {}) {
+                const url = new URL(input instanceof Request ? input.url : input, location.href);
+                const method = (options.method || (input instanceof Request ? input.method : 'GET')).toUpperCase();
+                if (url.origin === location.origin && ['POST','PUT','PATCH','DELETE'].includes(method)) {
+                    const headers = new Headers(options.headers || (input instanceof Request ? input.headers : undefined));
+                    headers.set('X-CSRF-Token', await token());
+                    options = {...options, headers};
+                }
+                return nativeFetch(input, options);
+            };
+            document.addEventListener('submit', async event => {
+                const form = event.target;
+                if (!(form instanceof HTMLFormElement) || new URL(form.action).pathname !== '/logout') return;
+                event.preventDefault();
+                const button = form.querySelector('button');
+                button.disabled = true;
+                try {
+                    const response = await fetch('/logout', {method: 'POST'});
+                    if (!response.ok) throw new Error('Sign out failed. Please refresh and retry.');
+                    location.replace('/');
+                } catch (error) {
+                    button.disabled = false;
+                    alert(error.message);
+                }
+            }, true);
+        })();
+    </script>
+    <script>
+        const get = id => document.getElementById(id);
+
+        let editingId = null;
+        let savedImage = "";
+
+        // Create text safely.
+        function textElement(tag, text, className = "") {
+            const element = document.createElement(tag);
+            element.textContent = text;
+
+            if (className) {
+                element.className = className;
+                if (className === "badge") {
+                    element.dataset.status = String(text).toLowerCase();
+                }
+            }
+
+            return element;
+        }
+
+        function makeButton(text, className = "") {
+            const button = textElement("button", text, className);
+            button.type = "button";
+            return button;
+        }
+
+        function showMessage(element, text, error = false) {
+            element.textContent = text;
+            element.style.color = error ? "#b42335" : "#24734a";
+        }
+
+        // Read a JSON response and display useful backend errors.
+        async function api(url, options = {}) {
+            const response = await fetch(url, options);
+            const data = await response.json();
+
+            if (!response.ok) {
+                let error = "Unable to complete the request.";
+
+                if (typeof data.detail === "string") {
+                    error = data.detail;
+                } else if (Array.isArray(data.detail)) {
+                    error = data.detail.map(item => item.msg).join(" ");
+                } else if (data.detail && data.detail.message) {
+                    error = data.detail.message;
+                }
+
+                throw new Error(error);
+            }
+
+            return data;
+        }
+
+        function errorText(error, fallback) {
+            return error instanceof TypeError
+                ? fallback
+                : error.message;
+        }
+
+        // Switch between admin sections.
+        function openPage(name) {
+            document.querySelectorAll(".page").forEach(page => {
+                page.hidden = page.id !== name + "-page";
+            });
+
+            document.querySelectorAll("[data-page]").forEach(button => {
+                const selected = button.dataset.page === name;
+                button.classList.toggle("active", selected);
+
+                if (selected) {
+                    button.setAttribute("aria-current", "page");
+                } else {
+                    button.removeAttribute("aria-current");
+                }
+            });
+
+            if (name === "agents") {
+                return showAgentLog();
+            } else if (name === "dashboard") {
+                return loadDashboardEvents();
+            } else if (name === "venues") {
+                showVenues();
+            } else if (name === "events") {
+                showEvents();
+            } else if (name === "hires") {
+                showHires();
+            }
+        }
+
+        document.querySelectorAll("[data-page]").forEach(button => {
+            button.onclick = function () {
+                openPage(button.dataset.page);
+            };
+        });
+
+        // Dashboard event selector.
+        async function loadDashboardEvents() {
+            const select = get("summary-event");
+            const previous = select.value;
+            const refreshButton = get("refresh-dashboard");
+
+            refreshButton.disabled = true;
+
+            try {
+                const events = await api("/admin/events");
+
+                select.replaceChildren();
+                select.append(new Option("Choose an event", ""));
+
+                for (const event of events) {
+                    select.append(new Option(
+                        event.title + " · #" + event.id +
+                        " · " + event.status,
+                        event.id
+                    ));
+                }
+
+                if (events.some(event => String(event.id) === previous)) {
+                    select.value = previous;
+                }
+
+                if (events.length === 0) {
+                    showMessage(
+                        get("summary-message"),
+                        "No events yet. Open Events to create one."
+                    );
+                }
+            } catch (error) {
+                showMessage(
+                    get("summary-message"),
+                    errorText(error, "Unable to connect to the server."),
+                    true
+                );
+            } finally {
+                refreshButton.disabled = false;
+            }
+        }
+
+        get("refresh-dashboard").onclick = loadDashboardEvents;
+
+        get("summary-event").onchange = function () {
+            get("summary-results").replaceChildren();
+            get("summary-message").textContent = "";
+        };
+
+        get("summary-form").onsubmit = async function (event) {
+            event.preventDefault();
+
+            const button = get("summary-button");
+            const message = get("summary-message");
+            const results = get("summary-results");
+
+            button.disabled = true;
+            message.textContent = "Loading summary…";
+            results.replaceChildren();
+
+            try {
+                const data = await api(
+                    "/admin/events/" + get("summary-event").value + "/summary"
+                );
+
+                showMessage(message, data.event);
+
+                const figures = [
+                    ["Venue capacity", data.venue_capacity],
+                    ["Active tickets sold", data.tickets_sold],
+                    [
+                        "Net simulated revenue",
+                        "Rs. " + Number(data.simulated_revenue).toFixed(2)
+                    ],
+                    ["Recorded check-ins", data.check_ins]
+                ];
+
+                for (const [label, value] of figures) {
+                    const metric = document.createElement("div");
+                        metric.className = "summary-item";
+                        metric.append(
+                            textElement("span", label),
+                            textElement("strong", value)
+                        );
+                        results.append(metric);
+                }
+            } catch (error) {
+                showMessage(
+                    message,
+                    errorText(error, "Unable to connect to the server."),
+                    true
+                );
+            } finally {
+                button.disabled = false;
+            }
+        };
+
+        // Venue editor.
+        function resetVenueForm() {
+            get("venue-form").reset();
+            editingId = null;
+            savedImage = "";
+
+            get("form-title").textContent = "Add a venue";
+            get("save-button").textContent = "Save venue";
+            get("image").required = true;
+            get("photo-preview").hidden = true;
+            get("photo-preview").removeAttribute("src");
+            get("photo-help").textContent =
+                "Choose a photo for the new venue.";
+        }
+
+        get("add-venue").onclick = function () {
+            resetVenueForm();
+            get("result").textContent = "";
+            get("venue-editor").hidden = false;
+            get("name").focus();
+        };
+
+        get("cancel-edit").onclick = function () {
+            resetVenueForm();
+            get("venue-editor").hidden = true;
+            get("result").textContent = "";
+        };
+
+        function editVenue(venue) {
+            resetVenueForm();
+
+            editingId = venue.id;
+            savedImage = venue.image || "";
+
+            get("form-title").textContent = "Edit venue #" + venue.id;
+            get("save-button").textContent = "Update venue";
+
+            get("name").value = venue.name;
+            get("location").value = venue.location;
+            get("capacity").value = venue.capacity;
+            get("description").value = venue.description;
+            get("rate").value = venue.hourly_rate;
+            get("hire").checked = Boolean(venue.open_for_hire);
+            get("image").required = false;
+
+            get("photo-help").textContent =
+                "Leave the photo empty to keep the current image.";
+
+            if (savedImage.startsWith("/uploads/")) {
+                get("photo-preview").src = savedImage;
+                get("photo-preview").hidden = false;
+            }
+
+            get("result").textContent = "";
+            get("venue-editor").hidden = false;
+            get("venue-editor").scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+
+        get("venue-form").onsubmit = async function (event) {
+            event.preventDefault();
+
+            const photo = get("image").files[0];
+            const result = get("result");
+            const button = get("save-button");
+
+            if (editingId === null && !photo) {
+                showMessage(result, "Choose a venue photo.", true);
+                return;
+            }
+
+            if (photo && photo.size > 5 * 1024 * 1024) {
+                showMessage(
+                    result,
+                    "Choose an image smaller than 5 MB.",
+                    true
+                );
+                return;
+            }
+
+            button.disabled = true;
+            get("cancel-edit").disabled = true;
+            get("add-venue").disabled = true;
+            get("load-venues").disabled = true;
+            result.textContent = "Saving venue…";
+
+            // Prevent another venue being opened during this save.
+            get("venue-list").querySelectorAll("button").forEach(item => {
+                item.disabled = true;
+            });
+
+            try {
+                let imagePath = savedImage;
+
+                if (photo) {
+                    result.textContent = "Uploading photo…";
+
+                    const upload = await api("/venue-image", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/octet-stream"
+                        },
+                        body: photo
+                    });
+
+                    imagePath = upload.image;
+                }
+
+                const url = editingId === null
+                    ? "/venues"
+                    : "/venues/" + editingId;
+
+                const data = await api(url, {
+                    method: editingId === null ? "POST" : "PUT",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        name: get("name").value,
+                        location: get("location").value,
+                        capacity: Number(get("capacity").value),
+                        description: get("description").value,
+                        image: imagePath,
+                        hourly_rate: Number(get("rate").value),
+                        open_for_hire: get("hire").checked
+                    })
+                });
+
+                resetVenueForm();
+                get("venue-editor").hidden = true;
+                showMessage(result, data.message || "Venue saved.");
+
+                await showVenues();
+            } catch (error) {
+                showMessage(
+                    result,
+                    errorText(
+                        error,
+                        "Connection lost. Check saved venues before retrying."
+                    ),
+                    true
+                );
+            } finally {
+                button.disabled = false;
+                get("cancel-edit").disabled = false;
+                get("add-venue").disabled = false;
+                get("load-venues").disabled = false;
+
+                get("venue-list").querySelectorAll("button").forEach(item => {
+                    item.disabled = false;
+                });
+            }
+        };
+
+        // Saved venues.
+        async function showVenues() {
+            const list = get("venue-list");
+            const message = get("venues-message");
+            const button = get("load-venues");
+
+            button.disabled = true;
+            message.textContent = "Loading venues…";
+            list.replaceChildren();
+
+            try {
+                const venues = await api("/venues");
+                message.textContent = venues.length
+                    ? ""
+                    : "No venues yet. Click Add venue.";
+
+                for (const venue of venues) {
+                    const card = document.createElement("article");
+                    card.className = "card";
+
+                    card.append(
+                        textElement("h3", venue.name),
+                        textElement(
+                            "p",
+                            "ID: " + venue.id + " · " + venue.location
+                        ),
+                        textElement("p", venue.description || ""),
+                        textElement(
+                            "p",
+                            "Capacity: " + venue.capacity +
+                            " · Rs. " +
+                            Number(venue.hourly_rate).toFixed(2) +
+                            " per hour"
+                        ),
+                        textElement(
+                            "span",
+                            venue.open_for_hire
+                                ? "Available for private hire"
+                                : "Closed for private hire",
+                            "badge"
+                        )
+                    );
+
+                    if ((venue.image || "").startsWith("/uploads/")) {
+                        const image = document.createElement("img");
+                        image.src = venue.image;
+                        image.alt = venue.name;
+                        image.className = "venue-photo";
+                        card.append(image);
+                    }
+
+                    const actions = document.createElement("div");
+                    actions.className = "actions form-actions";
+
+                    const edit = makeButton("Edit venue", "secondary");
+                    edit.onclick = () => editVenue(venue);
+
+                    actions.append(edit);
+                    card.append(actions);
+                    list.append(card);
+                }
+            } catch (error) {
+                showMessage(
+                    message,
+                    errorText(error, "Unable to connect to the server."),
+                    true
+                );
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        get("load-venues").onclick = showVenues;
+
+        // Open event creation form.
+        get("add-event").onclick = async function () {
+            const button = get("add-event");
+            button.disabled = true;
+
+            try {
+                const venues = await api("/venues");
+                const select = get("event-venue");
+
+                select.replaceChildren();
+                select.append(new Option("Choose a venue", ""));
+
+                for (const venue of venues) {
+                    select.append(new Option(
+                        venue.name + " · Capacity " + venue.capacity,
+                        venue.id
+                    ));
+                }
+
+                if (venues.length === 0) {
+                    showMessage(
+                        get("event-result"),
+                        "Add a venue in the Venues tab first.",
+                        true
+                    );
+                    return;
+                }
+
+                get("event-result").textContent = "";
+                get("event-editor").hidden = false;
+                get("event-title").focus();
+            } catch (error) {
+                showMessage(
+                    get("event-result"),
+                    errorText(error, "Unable to load venues."),
+                    true
+                );
+            } finally {
+                button.disabled = false;
+            }
+        };
+
+        get("cancel-event-form").onclick = function () {
+            get("event-form").reset();
+            get("event-editor").hidden = true;
+            get("event-result").textContent = "";
+        };
+
+        // Save a draft event.
+        get("event-form").onsubmit = async function (event) {
+            event.preventDefault();
+
+            const button = get("create-event-button");
+            const result = get("event-result");
+            const start = get("event-start").value;
+            const end = get("event-end").value;
+
+            if (new Date(start) <= new Date()) {
+                showMessage(
+                    result,
+                    "Choose a start date and time in the future.",
+                    true
+                );
+                return;
+            }
+
+            if (new Date(end) <= new Date(start)) {
+                showMessage(result, "End time must be after start time.", true);
+                return;
+            }
+
+            button.disabled = true;
+            get("cancel-event-form").disabled = true;
+            get("add-event").disabled = true;
+            result.textContent = "Saving draft…";
+
+            try {
+                const data = await api("/events", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        title: get("event-title").value,
+                        category: get("event-category").value,
+                        venue_id: Number(get("event-venue").value),
+                        start_time: start,
+                        end_time: end,
+                        description: get("event-description").value,
+                        ticket_name: get("ticket-name").value,
+                        ticket_price: Number(get("ticket-price").value),
+                        ticket_quantity: Number(get("ticket-quantity").value)
+                    })
+                });
+
+                get("event-form").reset();
+                get("event-editor").hidden = true;
+
+                showMessage(
+                    result,
+                    "Draft created. Event ID: " + data.event_id +
+                    ". Click Publish on its event card when ready."
+                );
+
+                await showEvents();
+            } catch (error) {
+                showMessage(
+                    result,
+                    errorText(
+                        error,
+                        "Connection lost. Check the event list before retrying."
+                    ),
+                    true
+                );
+            } finally {
+                button.disabled = false;
+                get("cancel-event-form").disabled = false;
+                get("add-event").disabled = false;
+            }
+        };
+
+        // Saved events with actions on each card.
+        async function showEvents() {
+            const list = get("admin-event-list");
+            const message = get("events-message");
+            const refresh = get("load-events");
+
+            refresh.disabled = true;
+            list.replaceChildren();
+            message.textContent = "Loading events…";
+
+            try {
+                const events = await api("/admin/events");
+
+                message.textContent = events.length
+                    ? ""
+                    : "No events yet. Click Create event.";
+
+                for (const event of events) {
+                    const card = document.createElement("article");
+                    card.className = "card";
+
+                    const badge = textElement(
+                        "span",
+                        event.status,
+                        "badge"
+                    );
+
+                    card.append(
+                        textElement("h3", event.title),
+                        badge,
+                        textElement("p", "Event ID: " + event.id),
+                        textElement(
+                            "p",
+                            new Date(event.start_time).toLocaleString()
+                        )
+                    );
+
+                    const actions = document.createElement("div");
+                    actions.className = "actions";
+
+                    const result = textElement("p", "");
+                    result.setAttribute("role", "status");
+
+                    if (event.status === "draft") {
+                        const publish = makeButton("Publish event");
+
+                        publish.onclick = async function () {
+                            publish.disabled = true;
+                            refresh.disabled = true;
+                            result.textContent = "Publishing…";
+
+                            try {
+                                const data = await api(
+                                    "/events/" + event.id + "/publish",
+                                    {method: "POST"}
+                                );
+
+                                event.status = "published";
+                                badge.textContent = "published";
+                                badge.dataset.status = String(badge.textContent).toLowerCase();
+                                showMessage(
+                                    result,
+                                    data.message || "Event published."
+                                );
+
+                                publish.remove();
+                                addCancelButton();
+                            } catch (error) {
+                                showMessage(
+                                    result,
+                                    errorText(
+                                        error,
+                                        "Connection lost. Refresh events to check the status."
+                                    ),
+                                    true
+                                );
+                            } finally {
+                                publish.disabled = false;
+                                refresh.disabled = false;
+                            }
+                        };
+
+                        actions.append(publish);
+                    }
+
+                    function addCancelButton() {
+                        const cancel = makeButton("Cancel event", "danger");
+
+                        cancel.onclick = async function () {
+                            if (!confirm(
+                                "Cancel " + event.title +
+                                " and refund its active paid bookings?"
+                            )) {
+                                return;
+                            }
+
+                            cancel.disabled = true;
+                            refresh.disabled = true;
+                            result.textContent = "Cancelling event…";
+
+                            try {
+                                const data = await api(
+                                    "/events/" + event.id + "/cancel",
+                                    {method: "POST"}
+                                );
+
+                                event.status = "cancelled";
+                                badge.textContent = "cancelled";
+                                badge.dataset.status = String(badge.textContent).toLowerCase();
+
+                                showMessage(
+                                    result,
+                                    data.bookings_cancelled +
+                                    " bookings cancelled. Total refund: Rs. " +
+                                    Number(data.total_refund).toFixed(2)
+                                );
+
+                                cancel.remove();
+                            } catch (error) {
+                                showMessage(
+                                    result,
+                                    errorText(
+                                        error,
+                                        "Connection lost. Refresh events to check the status."
+                                    ),
+                                    true
+                                );
+                            } finally {
+                                cancel.disabled = false;
+                                refresh.disabled = false;
+                            }
+                        };
+
+                        actions.append(cancel);
+                    }
+
+                    if (event.status === "published") {
+                        addCancelButton();
+                    }
+
+                    const summary = makeButton("View summary", "secondary");
+
+                    summary.onclick = async function () {
+                        await openPage("dashboard");
+
+                        // Select the event after the dropdown has loaded.
+                        get("summary-event").value = String(event.id);
+                        get("summary-form").requestSubmit();
+                    };
+
+                    actions.append(summary);
+                    card.append(actions, result);
+                    list.append(card);
+                }
+            } catch (error) {
+                showMessage(
+                    message,
+                    errorText(error, "Unable to connect to the server."),
+                    true
+                );
+            } finally {
+                refresh.disabled = false;
+            }
+        }
+
+        get("load-events").onclick = showEvents;
+
+        // Hire request list and review.
+        async function showHires() {
+            const list = get("hire-list");
+            const message = get("hires-message");
+            const refresh = get("load-hires");
+
+            refresh.disabled = true;
+            list.replaceChildren();
+            message.textContent = "Loading hire requests…";
+
+            try {
+                const hires = await api("/admin/hires");
+
+                message.textContent = hires.length
+                    ? ""
+                    : "No hire requests yet.";
+
+                for (const hire of hires) {
+                    const card = document.createElement("article");
+                    card.className = "card";
+
+                    const badge = textElement(
+                        "span",
+                        hire.status,
+                        "badge"
+                    );
+
+                    card.append(
+                        textElement(
+                            "h3",
+                            "Hire #" + hire.id + " · " + hire.venue_name
+                        ),
+                        badge,
+                        textElement(
+                            "p",
+                            "Attendee: " + hire.attendee_email
+                        ),
+                        textElement(
+                            "p",
+                            "From: " +
+                            new Date(hire.start_time).toLocaleString()
+                        ),
+                        textElement(
+                            "p",
+                            "To: " +
+                            new Date(hire.end_time).toLocaleString()
+                        ),
+                        textElement("p", "Purpose: " + hire.purpose),
+                        textElement("p", "Guests: " + hire.guest_count)
+                    );
+
+                    if (hire.status === "pending") {
+                        const actions = document.createElement("div");
+                        actions.className = "actions";
+
+                        const approve = makeButton("Approve");
+                        const reject = makeButton("Reject", "secondary");
+
+                        const result = textElement("p", "");
+                        result.setAttribute("role", "status");
+
+                        async function review(approved) {
+                            approve.disabled = true;
+                            reject.disabled = true;
+                            refresh.disabled = true;
+                            result.textContent = "Saving decision…";
+
+                            try {
+                                const data = await api(
+                                    "/hires/" + hire.id + "/review",
+                                    {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json"
+                                        },
+                                        body: JSON.stringify({
+                                            approve: approved
+                                        })
+                                    }
+                                );
+
+                                badge.textContent = data.status;
+
+                                badge.dataset.status = String(badge.textContent).toLowerCase();
+                                showMessage(
+                                    result,
+                                    "Hire request " + data.status + "."
+                                );
+
+                                actions.remove();
+                            } catch (error) {
+                                showMessage(
+                                    result,
+                                    errorText(
+                                        error,
+                                        "Connection lost. Refresh hire requests to check the status."
+                                    ),
+                                    true
+                                );
+                            } finally {
+                                approve.disabled = false;
+                                reject.disabled = false;
+                                refresh.disabled = false;
+                            }
+                        }
+
+                        approve.onclick = () => review(true);
+                        reject.onclick = () => review(false);
+
+                        actions.append(approve, reject);
+                        card.append(actions, result);
+                    }
+
+                    list.append(card);
+                }
+            } catch (error) {
+                showMessage(
+                    message,
+                    errorText(error, "Unable to connect to the server."),
+                    true
+                );
+            } finally {
+                refresh.disabled = false;
+            }
+        }
+
+        get("load-hires").onclick = showHires;
+
+        // Open the dashboard first.
+        loadDashboardEvents();
+
+        let agentLog = [];
+        async function showAgentLog() {
+            const button = get('refresh-agent-log');
+            button.disabled = true;
+            get('agent-log-message').textContent = 'Loading agent messages…';
+            try {
+                const [messages, states] = await Promise.all([api('/admin/agent-messages'), api('/admin/agent-state')]);
+                agentLog = messages;
+                const list = get('agent-state-list');
+                list.replaceChildren();
+                for (const state of states) {
+                    list.append(textElement('h3', state.agent));
+                    list.append(textElement('p', state.goal));
+                    list.append(textElement('p', 'Messages received: ' + state.messages_received + ' · Last decision: ' + state.last_decision));
+                    list.append(textElement('p', 'Rules: ' + JSON.stringify(state.rules)));
+                }
+                renderAgentMessages();
+            } catch (error) {
+                showMessage(get('agent-log-message'), error.message, true);
+            } finally {
+                button.disabled = false;
+            }
+        }
+        function renderAgentMessages() {
+            const filter = get('conversation-filter').value.trim();
+            const rows = agentLog.filter(message => !filter || message.conversation_id === filter).slice().reverse();
+            const list = get('agent-message-list');
+            list.replaceChildren();
+            get('agent-log-message').textContent = rows.length + ' messages';
+            for (const message of rows.slice(0, 200)) {
+                const card = textElement('div', '', 'ticket-details');
+                card.append(textElement('strong', message.performative + ' · ' + message.sender + ' → ' + message.receiver));
+                card.append(textElement('p', 'Conversation: ' + message.conversation_id));
+                card.append(textElement('p', JSON.stringify(message.content)));
+                list.append(card);
+            }
+            if (rows.length > 200) list.append(textElement('p', 'Showing the latest 200 messages. Filter by conversation ID to see one exchange.'));
+        }
+        get('refresh-agent-log').onclick = showAgentLog;
+        get('conversation-filter').oninput = renderAgentMessages;
+    </script>
+</body>
+</html>

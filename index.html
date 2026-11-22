@@ -1,0 +1,2325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>EventSphere</title>
+
+    <style>
+
+        :root {
+            --purple: #7040c8;
+            --purple-dark: #54309a;
+            --ink: #2b1c3f;
+            --muted: #776883;
+            --line: #e9e1f2;
+            --surface: #ffffff;
+            --background: #f8f6fc;
+            --soft: #f2ebfc;
+            --shadow: 0 8px 30px rgba(55, 26, 91, 0.045);
+        }
+
+        * { box-sizing: border-box; }
+        [hidden] { display: none !important; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", sans-serif;
+            color: var(--ink);
+            background: var(--background);
+        }
+        button, input, textarea, select { font: inherit; }
+        button {
+            min-height: 44px;
+            padding: 12px 19px;
+            border: 1px solid transparent;
+            border-radius: 11px;
+            background: var(--purple);
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .18s ease, box-shadow .18s ease;
+        }
+        button:hover { background: var(--purple-dark); }
+        button:disabled { opacity: .55; cursor: default; }
+        button:focus-visible, input:focus-visible,
+        textarea:focus-visible, select:focus-visible {
+            outline: 3px solid #cbb5f3;
+            outline-offset: 3px;
+        }
+        .secondary {
+            background: var(--soft);
+            color: #6338a2;
+        }
+        .secondary:hover { background: #e7d9f8; }
+        .danger { color: #b12f49; background: #fff0f3; }
+        .danger:hover { background: #fbdfe6; }
+        h1, h2, h3 { overflow-wrap: anywhere; }
+        h1 { margin: 0; font-size: 23px; letter-spacing: -.8px; }
+        h2 { margin: 0 0 12px; font-size: 27px; letter-spacing: -.9px; }
+        h3 { margin: 0 0 14px; font-size: 21px; letter-spacing: -.5px; }
+        p {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.75;
+            overflow-wrap: anywhere;
+        }
+        label {
+            display: block;
+            margin: 18px 0 9px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #594767;
+        }
+        input, select, textarea {
+            width: 100%;
+            min-width: 0;
+            min-height: 48px;
+            padding: 13px 14px;
+            border: 1px solid #e3d9ed;
+            border-radius: 11px;
+            color: var(--ink);
+            background: #fcfbfe;
+            font-size: 14px;
+            transition: border-color .18s ease, box-shadow .18s ease;
+        }
+        input::placeholder, textarea::placeholder { color: #978b9f; }
+        input:focus, select:focus, textarea:focus {
+            border-color: #a57cd9;
+            box-shadow: 0 0 0 3px #f1e9fc;
+        }
+        textarea { min-height: 115px; resize: vertical; }
+        input[type="file"]::file-selector-button {
+            padding: 9px 13px;
+            margin-right: 12px;
+            border: 0;
+            border-radius: 7px;
+            background: #eee5fc;
+            color: #6338a2;
+            cursor: pointer;
+        }
+        header {
+            padding: 24px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--line);
+        }
+        .header-content, nav, .content, .admin-content {
+            width: 100%;
+            max-width: 1180px;
+            margin: auto;
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        .brand { display: flex; align-items: center; gap: 13px; min-width: 0; }
+        .logo {
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: linear-gradient(145deg, #8755dc, #5d2cac);
+            box-shadow: 0 6px 16px #7040c824;
+            color: white;
+            font-size: 25px;
+            font-weight: 700;
+        }
+        header p { margin: 4px 0 0; font-size: 12px; }
+        .brand-role {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 4px 7px;
+            border-radius: 6px;
+            vertical-align: middle;
+            background: #f2ebfc;
+            color: #79539d;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .signout-form { margin: 0; flex-shrink: 0; }
+        .signout-form button {
+            min-height: 40px;
+            white-space: nowrap;
+            border: 1px solid var(--line);
+            background: white;
+            color: #715783;
+            font-size: 12px;
+        }
+        .signout-form button:hover { background: var(--soft); }
+        .navigation {
+            padding: 12px 24px;
+            background: white;
+            border-bottom: 1px solid var(--line);
+        }
+        nav { display: flex; flex-wrap: wrap; gap: 8px; }
+        nav button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 9px;
+            padding: 11px 19px;
+            background: transparent;
+            color: #7b6c87;
+            font-size: 13px;
+        }
+        nav button:hover { background: #f8f4fe; }
+        nav button.active { background: #eee6fc; color: #6836b3; }
+        .nav-icon { width: 17px; height: 17px; flex-shrink: 0; }
+        .content, .admin-content { padding: 30px 24px 64px; }
+        .card {
+            min-width: 0;
+            padding: 28px;
+            border: 1px solid var(--line);
+            border-radius: 19px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+        }
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin: 26px 0 20px;
+        }
+        .toolbar h2 { margin: 0; font-size: 25px; }
+        .toolbar > button, .toolbar .secondary {
+            color: #76598e;
+            background: white;
+            border-color: var(--line);
+        }
+        .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+        .form-actions { margin-top: 24px; }
+        .section-eyebrow {
+            display: block;
+            margin-bottom: 8px;
+            color: #896c9c;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+        }
+        .page-hero, .events-hero {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            align-items: center;
+            min-height: 235px;
+            padding: 38px 42px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            isolation: isolate;
+            border: 1px solid #7854a6;
+            border-radius: 23px;
+            color: white;
+            background:
+                radial-gradient(circle at 85% 10%, #bf93ff4d, transparent 45%),
+                linear-gradient(120deg, #302047, #7040c8);
+        }
+        .page-hero::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            width: 280px;
+            height: 280px;
+            right: -80px;
+            bottom: -170px;
+            border: 1px solid #ffffff24;
+            border-radius: 50%;
+            box-shadow: 0 0 0 35px #ffffff05, 0 0 0 70px #ffffff04;
+        }
+        .hero-eyebrow {
+            display: block;
+            margin-bottom: 16px;
+            color: #dbc5fa;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+        }
+        .page-hero h2, .events-hero h2 {
+            max-width: 590px;
+            margin: 0;
+            color: white;
+            font-size: clamp(29px, 3.1vw, 40px);
+            line-height: 1.18;
+            letter-spacing: -1.35px;
+        }
+        .page-hero p, .events-hero p {
+            max-width: 470px;
+            margin: 16px 0 0;
+            color: #e3d7f3;
+            font-size: 13px;
+            line-height: 1.9;
+        }
+        .hero-decoration {
+            position: relative;
+            display: grid;
+            place-items: center;
+            align-self: stretch;
+        }
+        .hero-orbit {
+            position: absolute;
+            width: 255px;
+            height: 255px;
+            border: 1px solid #ffffff24;
+            border-radius: 50%;
+            box-shadow: 0 0 0 25px #ffffff05;
+        }
+        .hero-ticket {
+            position: relative;
+            width: 206px;
+            padding: 23px;
+            border: 1px solid #ffffff80;
+            border-radius: 17px;
+            background: #fcf9ff;
+            color: #422559;
+            box-shadow: 12px 18px 30px #1d103c33;
+            transform: rotate(8deg);
+        }
+        .hero-ticket-star { display: block; margin-bottom: 13px; color: #8755dc; font-size: 32px; }
+        .hero-ticket strong { display: block; font-size: 15px; line-height: 1.5; }
+        .hero-ticket > span:not(.hero-ticket-star) {
+            display: block;
+            margin-top: 7px;
+            color: #78648c;
+            font-size: 10px;
+        }
+        .ticket-perforation { margin: 19px -23px 14px; border-top: 2px dashed #dfd3ee; }
+        .hero-ticket .ticket-bottom { font-size: 9px; letter-spacing: 2px; font-weight: 700; }
+        .hero-symbol {
+            position: relative;
+            display: grid;
+            place-items: center;
+            justify-self: center;
+            width: 125px;
+            height: 125px;
+            border: 1px solid #ffffff45;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #ffffff20, #ffffff09);
+            box-shadow: 12px 15px 30px #1d103c15;
+            transform: rotate(8deg);
+        }
+        .hero-symbol svg { width: 61px; height: 61px; color: #f3eaff; transform: rotate(-8deg); }
+        .event-filters {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto auto;
+            align-items: end;
+            gap: 13px;
+            margin-bottom: 24px;
+            padding: 22px;
+        }
+        .event-filters label { margin-top: 0; }
+        .event-filters button { min-height: 48px; }
+        #event-list, #booking-list, .list {
+            display: grid;
+            gap: 22px;
+            align-items: start;
+        }
+        #event-list, #booking-list, #venue-list, #admin-event-list, #hire-list {
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 315px), 1fr));
+        }
+        .event-card, .booking-card,
+        .list > .card {
+            position: relative;
+            overflow: hidden;
+            transition: border-color .18s ease, box-shadow .18s ease;
+        }
+        .event-card::before, .booking-card::before, .list > .card::before {
+            content: "";
+            display: block;
+            height: 5px;
+            margin: -28px -28px 24px;
+            background: linear-gradient(90deg, #7040c8, #ab80e3, #e5d7f7);
+        }
+        .event-card:hover, .booking-card:hover, .list > .card:hover {
+            border-color: #cfb8ec;
+            box-shadow: 0 12px 30px #4527750d;
+        }
+        .event-card h3, .booking-card h3, .list > .card h3 {
+            font-size: 21px;
+            line-height: 1.4;
+        }
+        .event-card p, .booking-card p, .list > .card p { font-size: 13px; }
+        .event-card > button { width: 100%; margin-top: 8px; }
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border: 1px solid #e8dcf9;
+            border-radius: 30px;
+            background: #f2ebfc;
+            color: #7447ac;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge[data-status="approved"], .badge[data-status="published"], .badge[data-status="active"] {
+            color: #256b55; background: #edf8f2; border-color: #d6ecdf;
+        }
+        .badge[data-status="pending"], .badge[data-status="draft"] {
+            color: #89611d; background: #fff8e8; border-color: #f1e5c7;
+        }
+        .badge[data-status="cancelled"], .badge[data-status="rejected"] {
+            color: #a13d58; background: #fff0f4; border-color: #f1d9e2;
+        }
+        .ticket-details {
+            padding: 18px;
+            margin-top: 18px;
+            border: 1px solid #e8dcf8;
+            border-radius: 13px;
+            background: #faf7ff;
+        }
+        .ticket-details button { width: 100%; margin-top: 14px; }
+        .booking-card .actions { margin-top: 18px; }
+        .actions button { font-size: 12px; }
+        .qr-list { margin-top: 18px; }
+        .qr-image { display: block; width: 200px; max-width: 100%; height: auto; }
+        .hire-card, .form-card { max-width: 780px; padding: 32px; }
+        .form-card { margin-bottom: 26px; }
+        .hire-card > h3, .form-card > h3, .overview-card > h3 {
+            padding-bottom: 16px;
+            border-bottom: 1px solid #eee7f5;
+        }
+        .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+        .field-grid .field-wide { grid-column: 1 / -1; }
+        .checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 11px;
+            background: #fcfaff;
+        }
+        .checkbox input { width: 17px; min-height: auto; height: 17px; margin: 0; accent-color: var(--purple); }
+        .venue-photo, #photo-preview {
+            display: block;
+            width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            margin: 18px 0;
+        }
+        .notifications-card { margin-top: 28px; }
+        .notification-item {
+            padding: 18px 20px;
+            margin-top: 16px;
+            border: 1px solid #e7dcf4;
+            border-left: 3px solid #9872cc;
+            border-radius: 12px;
+            background: #f8f4fe;
+        }
+        .notification-item p { margin: 0; font-size: 13px; }
+        [role="status"]:empty { display: none; }
+        .overview-card { padding: 32px; }
+        #summary-results {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 26px;
+        }
+        .summary-item {
+            margin: 0;
+            padding: 23px;
+            min-width: 0;
+            border: 1px solid #e8def5;
+            border-radius: 14px;
+            background: linear-gradient(145deg, #faf7ff, #f2eafb);
+        }
+        .summary-item span { display: block; color: #79638d; font-size: 12px; }
+        .summary-item strong {
+            display: block;
+            margin-top: 13px;
+            color: #5d3591;
+            font-size: clamp(23px, 2.5vw, 31px);
+            letter-spacing: -1px;
+            overflow-wrap: anywhere;
+        }
+        .panel-note { margin: 0 0 8px; color: #82708f; font-size: 13px; }
+        .workspace-footer { margin-top: 35px; text-align: center; color: #8a7a97; font-size: 11px; }
+        .scanner-layout { display: grid; grid-template-columns: 1.15fr 1fr; gap: 24px; align-items: start; }
+        .scanner-panel, .entry-panel { padding: 28px; }
+        .panel-step { display: flex; gap: 11px; align-items: center; margin-bottom: 14px; }
+        .step-number {
+            display: grid; place-items: center; width: 31px; height: 31px;
+            border-radius: 10px; background: var(--soft); color: #7249a6;
+            font-size: 12px; font-weight: 700; flex-shrink: 0;
+        }
+        .panel-step h3 { margin: 0; font-size: 19px; }
+        #reader { margin: 20px 0 12px; border-radius: 14px; overflow: hidden; background: #fdfbff; }
+        #reader video, #reader img { max-width: 100%; }
+        #reader button { font-size: 12px; max-width: 100%; }
+        #reader a { color: #7040c8; font-size: 13px; }
+        #reader input { max-width: 100%; }
+        #check-button { width: 100%; margin-top: 6px; }
+        #result:not(:empty) {
+            padding: 15px; border: 1px solid var(--line); border-radius: 11px;
+            background: #faf7ff; font-size: 13px; font-weight: 600;
+        }
+        .scanner-help {
+            margin-top: 22px; padding-top: 19px; border-top: 1px solid var(--line);
+            color: #85728f; font-size: 12px; line-height: 1.8;
+        }
+        @media (max-width: 850px) {
+            .event-filters { grid-template-columns: 1fr 1fr; }
+            #summary-results { grid-template-columns: 1fr 1fr; }
+            .page-hero, .events-hero { grid-template-columns: 1.6fr 1fr; padding: 32px; }
+            .hero-ticket { width: 180px; padding: 20px; }
+            .scanner-layout { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            header, .navigation { padding: 16px; }
+            .header-content { gap: 12px; }
+            .brand { gap: 10px; }
+            .logo { width: 39px; height: 39px; border-radius: 11px; font-size: 22px; }
+            header h1 { font-size: 20px; }
+            header p { max-width: 190px; font-size: 11px; }
+            .brand-role { display: none; }
+            .signout-form button { padding: 9px 12px; font-size: 11px; }
+            .content, .admin-content { padding: 20px 16px 40px; }
+            nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+            .admin-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            nav button { flex-direction: column; gap: 6px; padding: 10px 5px; font-size: 11px; }
+            .card, .hire-card, .form-card, .overview-card { padding: 22px; }
+            .event-card::before, .booking-card::before, .list > .card::before { margin: -22px -22px 22px; }
+            .page-hero, .events-hero {
+                min-height: auto; grid-template-columns: 1fr; padding: 28px;
+                margin-bottom: 24px; border-radius: 19px;
+            }
+            .page-hero h2, .events-hero h2 { font-size: 31px; }
+            .page-hero p, .events-hero p { font-size: 12px; }
+            .hero-decoration, .hero-symbol { display: none; }
+            .hero-eyebrow { font-size: 9px; }
+            .toolbar { margin-top: 20px; gap: 13px; }
+            .toolbar h2 { font-size: 23px; }
+            .toolbar .actions { flex-wrap: wrap; }
+            #event-list, #booking-list, #venue-list, #admin-event-list, #hire-list { grid-template-columns: minmax(0, 1fr); }
+            .event-filters, .field-grid { grid-template-columns: minmax(0, 1fr); }
+            .event-filters { gap: 15px; }
+            .summary-item { padding: 17px; }
+            .summary-item strong { font-size: 23px; }
+            #summary-results { gap: 10px; }
+            .actions button { flex: 1; }
+        }
+        @media (max-width: 360px) {
+            .header-content { flex-wrap: wrap; }
+            .signout-form { margin-left: auto; }
+            #summary-results { grid-template-columns: 1fr; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+        }
+
+        /* Modern login and registration layout */
+        #login-page.auth-shell {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: calc(100% - 48px);
+            max-width: 1040px;
+            margin: 48px auto;
+            padding: 0;
+            overflow: hidden;
+            background: white;
+            border: 1px solid #e9e1f4;
+            border-radius: 28px;
+            box-shadow: 0 24px 80px rgba(49, 24, 89, 0.10);
+            animation: auth-appear 0.5s ease-out;
+        }
+
+        .auth-welcome {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 650px;
+            padding: 40px;
+            overflow: hidden;
+            color: white;
+            background:
+                radial-gradient(
+                    circle at 95% 10%,
+                    rgba(195, 166, 255, 0.3),
+                    transparent 45%
+                ),
+                linear-gradient(150deg, #352057, #7040c8);
+        }
+
+        .auth-welcome::after {
+            content: "";
+            position: absolute;
+            width: 360px;
+            height: 360px;
+            right: -190px;
+            bottom: -120px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 50%;
+            box-shadow:
+                0 0 0 45px rgba(255, 255, 255, 0.04),
+                0 0 0 90px rgba(255, 255, 255, 0.03);
+            pointer-events: none;
+        }
+
+        .auth-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 21px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .auth-mark {
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 13px;
+            background: rgba(255, 255, 255, 0.12);
+            font-size: 25px;
+        }
+
+        .auth-welcome-content {
+            position: relative;
+            z-index: 1;
+            margin: 60px 0;
+        }
+
+        .auth-eyebrow {
+            display: block;
+            margin-bottom: 22px;
+            color: #dbcaff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .auth-welcome h2 {
+            margin: 0;
+            color: white;
+            font-size: clamp(32px, 3.5vw, 46px);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -1.8px;
+        }
+
+        .auth-welcome h2 span {
+            color: #d6b8ff;
+        }
+
+        .auth-welcome-content > p {
+            max-width: 330px;
+            margin: 24px 0 32px;
+            color: #e1d5f4;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .auth-ticket {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .auth-ticket-icon {
+            color: #e0c8ff;
+            font-size: 30px;
+        }
+
+        .auth-ticket strong,
+        .auth-ticket span {
+            display: block;
+        }
+
+        .auth-ticket strong {
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .auth-ticket span {
+            margin-top: 4px;
+            color: #e1d5f4;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .auth-welcome-footer {
+            position: relative;
+            z-index: 1;
+            color: #d5c4ee;
+            font-size: 12px;
+        }
+
+        .auth-form-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+            padding: 48px;
+        }
+
+        .auth-small-label {
+            color: #805eaa;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+        }
+
+        #login-page #auth-title {
+            margin: 16px 0 12px;
+            font-size: 34px;
+            line-height: 1.2;
+            letter-spacing: -1px;
+        }
+
+        #auth-intro {
+            margin: 0 0 24px;
+            color: #81758f;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        #login-page label {
+            margin: 18px 0 9px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        #login-page input {
+            min-height: 50px;
+            padding: 14px;
+            border: 1px solid #e4dced;
+            border-radius: 11px;
+            background: #fcfbfe;
+            font-size: 14px;
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        #login-page input::placeholder {
+            color: #a297af;
+        }
+
+        #login-page input:focus {
+            outline: none;
+            border-color: #9064d4;
+            box-shadow: 0 0 0 4px #f0e8fc;
+        }
+
+        #login-page #login-button,
+        #login-page #register-button {
+            width: 100%;
+            min-height: 50px;
+            margin-top: 26px;
+            border-radius: 11px;
+            background: #7040c8;
+            box-shadow: 0 8px 18px rgba(112, 64, 200, 0.17);
+            font-size: 14px;
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        #login-page #login-button:hover,
+        #login-page #register-button:hover {
+            background: #5a2fac;
+            transform: translateY(-1px);
+        }
+
+        #login-page .auth-switch {
+            width: 100%;
+            min-height: 46px;
+            margin-top: 12px;
+            border: 1px solid #e9e0f6;
+            border-radius: 11px;
+            background: white;
+            color: #7040c8;
+            font-size: 13px;
+        }
+
+        #login-page .auth-switch:hover {
+            background: #f7f2ff;
+        }
+
+        #login-page #password-help {
+            margin: 8px 0 0;
+            font-size: 12px;
+        }
+
+        #login-page #message {
+            margin-bottom: 0;
+            font-size: 13px;
+        }
+
+        #login-page #message:empty {
+            display: none;
+        }
+
+        .auth-footer {
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid #f0eaf6;
+            color: #95889f;
+            font-size: 11px;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        @keyframes auth-appear {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 760px) {
+            #login-page.auth-shell {
+                grid-template-columns: 1fr;
+                max-width: 480px;
+                margin: 24px auto;
+            }
+
+            .auth-welcome {
+                min-height: auto;
+                padding: 28px;
+            }
+
+            .auth-welcome-content {
+                margin: 32px 0 0;
+            }
+
+            .auth-welcome h2 {
+                font-size: 32px;
+            }
+
+            .auth-welcome-content > p {
+                margin-bottom: 0;
+                font-size: 14px;
+            }
+
+            .auth-ticket,
+            .auth-welcome-footer {
+                display: none;
+            }
+
+            .auth-form-panel {
+                padding: 30px 28px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            #login-page.auth-shell {
+                width: calc(100% - 24px);
+                margin: 12px auto;
+                border-radius: 20px;
+            }
+
+            .auth-welcome,
+            .auth-form-panel {
+                padding: 24px;
+            }
+
+            .auth-welcome h2 {
+                font-size: 29px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #login-page.auth-shell {
+                animation: none;
+            }
+
+            #login-page button,
+            #login-page input {
+                transition: none;
+            }
+
+            #login-page #login-button:hover,
+            #login-page #register-button:hover {
+                transform: none;
+            }
+        }
+
+
+
+
+        /* Related fields share a row on larger screens. */
+        .editor-form {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 0 20px;
+        }
+        .form-field { min-width: 0; }
+        .form-field.field-wide,
+        .editor-form > p,
+        .editor-form > img,
+        .editor-form > .actions,
+        .editor-form > .form-actions,
+        .editor-form > .checkbox,
+        .editor-form > button {
+            grid-column: 1 / -1;
+        }
+        @media (max-width: 600px) {
+            .editor-form { grid-template-columns: minmax(0, 1fr); }
+        }
+    </style>
+</head>
+
+<body>
+       <!-- Login and registration -->
+    <main id="login-page" class="auth-shell">
+        <!-- Welcome panel -->
+        <aside class="auth-welcome">
+            <div class="auth-brand">
+                <div class="auth-mark" aria-hidden="true">E</div>
+                <span>EventSphere</span>
+            </div>
+
+            <div class="auth-welcome-content">
+                <span class="auth-eyebrow">YOUR CAMPUS. YOUR MOMENTS.</span>
+
+                <h2>
+                    Great experiences<br>
+                    start here<span>.</span>
+                </h2>
+
+                <p>
+                    Discover something new. Find your people.
+                    Make your next university moment happen.
+                </p>
+
+                <div class="auth-ticket" aria-hidden="true">
+                    <div class="auth-ticket-icon">✦</div>
+
+                    <div>
+                        <strong>A little more to look forward to.</strong>
+                        <span>Events, tickets and spaces—all together.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auth-welcome-footer">
+                Made for your university community.
+            </div>
+        </aside>
+
+        <!-- Forms -->
+        <div class="auth-form-panel">
+            <div class="auth-form-heading">
+                <span class="auth-small-label">WELCOME TO EVENTSPHERE</span>
+
+                <h2 id="auth-title">Sign in</h2>
+
+                <p id="auth-intro">
+                    Sign in to book events, manage tickets and hire venues.
+                </p>
+            </div>
+
+            <form id="login-form">
+                <label for="email">Email address</label>
+                <input id="email" type="email"
+                       placeholder="you@example.com"
+                       autocomplete="username" required>
+
+                <label for="password">Password</label>
+                <input id="password" type="password"
+                       placeholder="Enter your password"
+                       autocomplete="current-password" required>
+
+                <button id="login-button" type="submit">
+                    Sign in
+                </button>
+            </form>
+
+            <button id="show-register" type="button"
+                    class="secondary auth-switch">
+                Create an attendee account
+            </button>
+
+            <form id="register-form" hidden>
+                <label for="register-email">Email address</label>
+                <input id="register-email" type="email"
+                       placeholder="you@example.com"
+                       autocomplete="username" required>
+
+                <label for="register-password">Password</label>
+                <input id="register-password" type="password"
+                       placeholder="Create a password"
+                       autocomplete="new-password"
+                       minlength="8"
+                       aria-describedby="password-help" required>
+
+                <p id="password-help">Use at least 8 characters.</p>
+
+                <label for="confirm-password">Confirm password</label>
+                <input id="confirm-password" type="password"
+                       placeholder="Enter your password again"
+                       autocomplete="new-password"
+                       minlength="8" required>
+
+                <button id="register-button" type="submit">
+                    Create account
+                </button>
+            </form>
+
+            <button id="show-login" type="button"
+                    class="secondary auth-switch" hidden>
+                Back to sign in
+            </button>
+
+            <p id="message" role="status"></p>
+
+            <div class="auth-footer">
+                Your next experience is one sign-in away.
+            </div>
+        </div>
+    </main>
+
+    <!-- Attendee interface -->
+    <div id="attendee-app" hidden>
+            <header>
+        <div class="header-content">
+            <div class="brand">
+                <div class="logo" aria-hidden="true">E</div>
+                <div>
+                    <h1>EventSphere</h1>
+                    <p>Your university events and spaces.</p>
+                </div>
+            </div>
+            <form action="/logout" method="post" class="signout-form">
+                <button type="submit">Sign out</button>
+            </form>
+        </div>
+    </header>
+
+        <div class="navigation">
+            <nav aria-label="Attendee navigation">
+                <button type="button" data-page="events"
+                        class="active" aria-current="page"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4M17 3v4M3 11h18M7 15h3M14 15h3"/></svg><span>Events</span></button>
+
+                <button type="button" data-page="bookings"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v5a2 2 0 0 0 0 4v5H4v-5a2 2 0 0 0 0-4V5Z"/><path d="M15 5v3M15 11v2M15 16v3"/></svg><span>My bookings</span></button>
+
+                <button type="button" data-page="hire"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h14V9M9 21v-7h6v7"/></svg><span>Venue hire</span></button>
+            </nav>
+        </div>
+
+        <main class="content">
+            <!-- Events -->
+            <section id="events-page" class="page">
+                <div class="events-hero">
+                    <div class="events-hero-content">
+                        <span class="hero-eyebrow">MAKE MORE OF CAMPUS LIFE</span>
+                        <h2>Your next great<br>moment starts here.</h2>
+                        <p>Discover workshops, meet new people and find something worth showing up for.</p>
+                    </div>
+                    <div class="hero-decoration" aria-hidden="true">
+                        <div class="hero-orbit"></div>
+                        <div class="hero-ticket">
+                            <span class="hero-ticket-star">✦</span>
+                            <strong>Good times ahead.</strong>
+                            <span>Find your next experience</span>
+                            <div class="ticket-perforation"></div>
+                            <span class="ticket-bottom">EVENTSPHERE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="toolbar events-heading">
+                    <div>
+                        <span class="section-eyebrow">EXPLORE WHAT’S ON</span>
+                        <h2>Discover events</h2>
+                    </div>
+                    <button id="load-events" type="button" class="secondary">
+                        Refresh events
+                    </button>
+                </div>
+
+                <form id="event-filter-form" class="card event-filters">
+                    <div>
+                        <label for="event-search">Search events</label>
+                        <input id="event-search" type="search"
+                               placeholder="Enter an event title">
+                    </div>
+                    <div>
+                        <label for="event-category-filter">Category</label>
+                        <select id="event-category-filter">
+                            <option value="">All categories</option>
+                        </select>
+                    </div>
+                    <button id="search-events" type="submit">Search</button>
+                    <button id="clear-event-filters" type="button"
+                            class="secondary">Clear</button>
+                </form>
+                <p id="events-message" role="status"></p>
+                <div id="event-list"></div>
+            </section>
+
+            <!-- Bookings and notifications -->
+            <section id="bookings-page" class="page" hidden>
+            <div class="page-hero">
+                <div>
+                    <span class="hero-eyebrow">YOUR EXPERIENCES, ALL TOGETHER</span>
+                    <h2>Good plans. Great memories.</h2>
+                    <p>Find your tickets, check your bookings and stay in the loop when new places open up.</p>
+                </div>
+                <div class="hero-symbol" aria-hidden="true"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v5a2 2 0 0 0 0 4v5H4v-5a2 2 0 0 0 0-4V5Z"/><path d="M15 5v3M15 11v2M15 16v3"/></svg></div>
+            </div>
+
+                <div class="toolbar">
+                    <h2>My bookings</h2>
+
+                    <button id="load-bookings" type="button"
+                            class="secondary">
+                        Refresh
+                    </button>
+                </div>
+
+                <p>View QR tickets and manage your bookings.</p>
+                <p id="bookings-message" role="status"></p>
+                <div id="booking-list"></div>
+                <section class="card notifications-card" aria-labelledby="offers-title">
+                    <h3 id="offers-title">Your reserved waitlist tickets</h3>
+                    <p>A seat is held briefly for you. Claim it before the timer expires.</p>
+                    <button type="button" id="refresh-offers" class="secondary">Refresh offers</button>
+                    <p id="offers-message" role="status"></p>
+                    <div id="offer-list"></div>
+                </section>
+
+
+                <section class="card notifications-card">
+                    <h3>Ticket availability notifications</h3>
+
+                    <button id="load-notifications" type="button"
+                            class="secondary">
+                        Refresh notifications
+                    </button>
+
+                    <p id="notifications-message" role="status"></p>
+                    <div id="notification-list"></div>
+                </section>
+            </section>
+
+            <!-- Venue hire -->
+            <section id="hire-page" class="page" hidden>
+            <div class="page-hero">
+                <div>
+                    <span class="hero-eyebrow">A SPACE FOR YOUR NEXT IDEA</span>
+                    <h2>Make room for something special.</h2>
+                    <p>From club meetups to celebrations, find a university space that fits your occasion.</p>
+                </div>
+                <div class="hero-symbol" aria-hidden="true"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h14V9M9 21v-7h6v7"/></svg></div>
+            </div>
+
+                <div class="toolbar">
+                    <h2>Venue hire</h2>
+                </div>
+
+                <div class="card hire-card">
+                    <h3>Request private venue hire</h3>
+
+                    <p>
+                        Request a venue for a farewell, club meeting
+                        or another private occasion.
+                    </p>
+
+                    <form id="hire-form" class="editor-form">
+                        <div class="form-field field-wide">
+<label for="hire-venue">Choose a venue</label>
+<select id="hire-venue" required>
+                            <option value="">Choose a venue</option>
+                        </select>
+</div>
+
+                        <p id="hire-venue-message" role="status"></p>
+
+                        <button id="refresh-hire-venues" type="button"
+                                class="secondary">
+                            Refresh venues
+                        </button>
+
+                        <div class="form-field">
+<label for="hire-start">Start date and time</label>
+<input id="hire-start"
+                               type="datetime-local" required>
+</div>
+
+                        <div class="form-field">
+<label for="hire-end">End date and time</label>
+<input id="hire-end"
+                               type="datetime-local" required>
+</div>
+
+                        <div class="form-field field-wide">
+<label for="hire-purpose">Purpose</label>
+<textarea id="hire-purpose"
+                                  placeholder="Example: IT club meeting"
+                                  required></textarea>
+</div>
+
+                        <div class="form-field">
+<label for="hire-guests">Number of guests</label>
+<input id="hire-guests" type="number"
+                               min="1" step="1" required>
+</div>
+
+                        <div class="form-actions">
+                            <button id="hire-button" type="submit">
+                                Submit hire request
+                            </button>
+                        </div>
+                    </form>
+
+                    <p id="hire-message" role="status"></p>
+                    <div id="hire-result"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+
+    <script>
+        // All three pages share CSRF-protected writes and normal sign-out forms.
+        (() => {
+            const nativeFetch = window.fetch.bind(window);
+            let tokenPromise;
+            async function token() {
+                if (!tokenPromise) {
+                    tokenPromise = nativeFetch('/csrf', {credentials: 'same-origin'})
+                        .then(response => {
+                            if (!response.ok) throw new Error('Unable to prepare a secure request.');
+                            return response.json();
+                        }).then(data => data.csrf_token)
+                        .catch(error => { tokenPromise = null; throw error; });
+                }
+                return tokenPromise;
+            }
+            window.fetch = async function (input, options = {}) {
+                const url = new URL(input instanceof Request ? input.url : input, location.href);
+                const method = (options.method || (input instanceof Request ? input.method : 'GET')).toUpperCase();
+                if (url.origin === location.origin && ['POST','PUT','PATCH','DELETE'].includes(method)) {
+                    const headers = new Headers(options.headers || (input instanceof Request ? input.headers : undefined));
+                    headers.set('X-CSRF-Token', await token());
+                    options = {...options, headers};
+                }
+                return nativeFetch(input, options);
+            };
+            document.addEventListener('submit', async event => {
+                const form = event.target;
+                if (!(form instanceof HTMLFormElement) || new URL(form.action).pathname !== '/logout') return;
+                event.preventDefault();
+                const button = form.querySelector('button');
+                button.disabled = true;
+                try {
+                    const response = await fetch('/logout', {method: 'POST'});
+                    if (!response.ok) throw new Error('Sign out failed. Please refresh and retry.');
+                    location.replace('/');
+                } catch (error) {
+                    button.disabled = false;
+                    alert(error.message);
+                }
+            }, true);
+        })();
+    </script>
+    <script>
+        const get = id => document.getElementById(id);
+
+        function textElement(tag, text, className = "") {
+            const element = document.createElement(tag);
+            element.textContent = text;
+
+            if (className) {
+                element.className = className;
+                if (className === "badge") {
+                    element.dataset.status = String(text).toLowerCase();
+                }
+            }
+
+            return element;
+        }
+
+        function makeButton(text, className = "") {
+            const button = textElement("button", text, className);
+            button.type = "button";
+            return button;
+        }
+
+        function showMessage(element, text, error = false) {
+            element.textContent = text;
+            element.style.color = error ? "#b42335" : "#24734a";
+        }
+
+        function backendError(data, fallback) {
+            if (typeof data.detail === "string") {
+                return data.detail;
+            }
+
+            if (Array.isArray(data.detail)) {
+                return data.detail.map(item => item.msg).join(" ");
+            }
+
+            if (data.detail && data.detail.message) {
+                return data.detail.message;
+            }
+
+            return fallback;
+        }
+
+        async function api(url, options = {}) {
+            const response = await fetch(url, options);
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    backendError(data, "Unable to complete the request.")
+                );
+            }
+
+            return data;
+        }
+
+        function errorText(error, fallback) {
+            return error instanceof TypeError
+                ? fallback
+                : error.message;
+        }
+
+        // Change the visible tab.
+        function openPage(name) {
+            document.querySelectorAll(".page").forEach(page => {
+                page.hidden = page.id !== name + "-page";
+            });
+
+            document.querySelectorAll("[data-page]").forEach(button => {
+                const active = button.dataset.page === name;
+                button.classList.toggle("active", active);
+
+                if (active) {
+                    button.setAttribute("aria-current", "page");
+                } else {
+                    button.removeAttribute("aria-current");
+                }
+            });
+
+            if (name === "events") {
+                showEvents();
+            } else if (name === "bookings") {
+                showBookings();
+                showNotifications();
+                showOffers();
+            } else if (name === "hire") {
+                loadHireVenues();
+            }
+        }
+
+        document.querySelectorAll("[data-page]").forEach(button => {
+            button.onclick = function () {
+                openPage(button.dataset.page);
+            };
+        });
+
+        let eventSearchVersion = 0;
+
+        // Published events.
+        async function showEvents() {
+            const list = get("event-list");
+            const message = get("events-message");
+            const refresh = get("load-events");
+
+            const version = ++eventSearchVersion;
+            const search = get("event-search").value.trim();
+            const category = get("event-category-filter").value;
+            const params = new URLSearchParams({search: search, category: category});
+
+            refresh.disabled = true;
+            list.replaceChildren();
+            message.textContent = "Loading events…";
+
+            try {
+                const events = await api("/events?" + params.toString());
+
+                if (version !== eventSearchVersion) {
+                    return;
+                }
+
+                message.textContent = events.length
+                    ? ""
+                    : (search || category
+                        ? "No events match your search. Try Clear."
+                        : "No published events yet.");
+
+                for (const event of events) {
+                    const card = document.createElement("article");
+                    card.className = "card event-card";
+
+                    const title = textElement("h3", event.title);
+
+                    const category = textElement(
+                        "span", event.category, "badge"
+                    );
+
+                    const date = textElement(
+                        "p",
+                        new Date(event.start_time).toLocaleString()
+                    );
+
+                    const viewButton = makeButton("View tickets");
+                    viewButton.setAttribute("aria-expanded", "false");
+
+                    const ticketList = document.createElement("div");
+                    ticketList.id = "tickets-" + event.id;
+
+                    viewButton.setAttribute(
+                        "aria-controls", ticketList.id
+                    );
+
+                    viewButton.onclick = function () {
+                        showTickets(event.id, ticketList, viewButton);
+                    };
+
+                    card.append(
+                        title, category, date, viewButton, ticketList
+                    );
+
+                    list.append(card);
+                }
+            } catch (error) {
+                if (version !== eventSearchVersion) {
+                    return;
+                }
+                showMessage(
+                    message,
+                    errorText(error, "Unable to connect. Please try again."),
+                    true
+                );
+            } finally {
+                if (version === eventSearchVersion) {
+                    refresh.disabled = false;
+                }
+            }
+        }
+
+        // Build category options from the actual published event categories.
+        async function loadEventCategories() {
+            try {
+                const events = await api("/events");
+                const select = get("event-category-filter");
+                const previous = select.value;
+                const categories = new Map();
+
+                for (const event of events) {
+                    const name = event.category;
+                    if (name) {
+                        categories.set(name.toLowerCase(), name);
+                    }
+                }
+
+                select.replaceChildren(new Option("All categories", ""));
+
+                for (const [value, label] of [...categories].sort(
+                    (a, b) => a[1].localeCompare(b[1])
+                )) {
+                    select.append(new Option(label, value));
+                }
+
+                if (categories.has(previous)) {
+                    select.value = previous;
+                }
+            } catch {
+                // Search remains usable if category loading fails.
+            }
+        }
+
+        get("event-filter-form").onsubmit = function (event) {
+            event.preventDefault();
+            showEvents();
+        };
+
+        get("clear-event-filters").onclick = function () {
+            get("event-filter-form").reset();
+            showEvents();
+        };
+
+        get("load-events").onclick = async function () {
+            await loadEventCategories();
+            showEvents();
+        };
+
+        // Ticket categories, booking and waitlist.
+        async function showTickets(eventId, ticketList, viewButton) {
+            viewButton.disabled = true;
+            ticketList.textContent = "Loading tickets…";
+
+            try {
+                const data = await api("/events/" + eventId);
+                ticketList.replaceChildren();
+
+                for (const ticket of data.tickets) {
+                    const box = document.createElement("div");
+                    box.className = "ticket-details";
+
+                    box.append(textElement(
+                        "p",
+                        ticket.name + " · Rs. " +
+                        Number(ticket.price).toFixed(2) +
+                        " · " + ticket.quantity + " tickets left"
+                    ));
+
+                    // Sold-out ticket category.
+                    if (Number(ticket.quantity) <= 0) {
+                        const soldOut = makeButton("Sold out");
+                        soldOut.disabled = true;
+
+                        const waitlistButton = makeButton(
+                            "Join waitlist", "secondary"
+                        );
+
+                        const waitlistMessage = textElement("p", "");
+                        waitlistMessage.setAttribute("role", "status");
+
+                        waitlistButton.onclick = async function () {
+                            waitlistButton.disabled = true;
+                            viewButton.disabled = true;
+
+                            waitlistMessage.style.color = "#746980";
+                            waitlistMessage.textContent =
+                                "Joining waitlist…";
+
+                            let joined = false;
+
+                            try {
+                                const result = await api("/waitlist", {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify({
+                                        ticket_category_id: ticket.id
+                                    })
+                                });
+
+                                joined = true;
+                                waitlistButton.textContent =
+                                    "Waitlist joined";
+
+                                showMessage(
+                                    waitlistMessage,
+                                    result.message || "Joined the waitlist."
+                                );
+                            } catch (error) {
+                                showMessage(
+                                    waitlistMessage,
+                                    errorText(
+                                        error,
+                                        "Connection lost. Refresh tickets before trying again."
+                                    ),
+                                    true
+                                );
+                            } finally {
+                                waitlistButton.disabled = joined;
+                                viewButton.disabled = false;
+                            }
+                        };
+
+                        box.append(
+                            soldOut, waitlistButton, waitlistMessage
+                        );
+
+                        ticketList.append(box);
+                        continue;
+                    }
+
+                    // Available ticket category.
+                    const bookingForm = document.createElement("form");
+
+                    const label = textElement(
+                        "label", "Number of tickets"
+                    );
+                    label.htmlFor = "quantity-" + ticket.id;
+
+                    const quantity = document.createElement("input");
+                    quantity.id = label.htmlFor;
+                    quantity.type = "number";
+                    quantity.min = "1";
+                    quantity.max = ticket.quantity;
+                    quantity.step = "1";
+                    quantity.value = "1";
+                    quantity.required = true;
+
+                    const bookButton = makeButton(
+                        "Book tickets · Simulated payment"
+                    );
+                    bookButton.type = "submit";
+
+                    const result = textElement("p", "");
+                    result.setAttribute("role", "status");
+
+                    bookingForm.onsubmit = async function (event) {
+                        event.preventDefault();
+
+                        bookButton.disabled = true;
+                        viewButton.disabled = true;
+                        get("load-events").disabled = true;
+
+                        result.style.color = "#746980";
+                        result.textContent = "Booking…";
+
+                        try {
+                            const booking = await api("/bookings", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({
+                                    ticket_category_id: ticket.id,
+                                    quantity: Number(quantity.value)
+                                })
+                            });
+
+                            bookingForm.hidden = true;
+
+                            showMessage(
+                                result,
+                                "Booking #" + booking.booking_id +
+                                " confirmed. Payment reference: " +
+                                booking.payment_reference
+                            );
+
+                            const historyButton = makeButton(
+                                "View my bookings", "secondary"
+                            );
+
+                            historyButton.onclick = function () {
+                                openPage("bookings");
+                            };
+
+                            box.append(historyButton);
+                        } catch (error) {
+                            showMessage(
+                                result,
+                                errorText(
+                                    error,
+                                    "Connection lost. Check My bookings before retrying."
+                                ),
+                                true
+                            );
+                        } finally {
+                            bookButton.disabled = false;
+                            viewButton.disabled = false;
+                            get("load-events").disabled = false;
+                        }
+                    };
+
+                    bookingForm.append(label, quantity, bookButton);
+                    box.append(bookingForm, result);
+                    ticketList.append(box);
+                }
+
+                if (data.tickets.length === 0) {
+                    ticketList.textContent =
+                        "No ticket categories available.";
+                }
+
+                viewButton.textContent = "Refresh tickets";
+                viewButton.setAttribute("aria-expanded", "true");
+            } catch (error) {
+                ticketList.textContent = errorText(
+                    error, "Unable to load tickets. Please try again."
+                );
+            } finally {
+                viewButton.disabled = false;
+            }
+        }
+
+        // Booking history.
+        async function showBookings() {
+            const list = get("booking-list");
+            const message = get("bookings-message");
+            const refresh = get("load-bookings");
+
+            refresh.disabled = true;
+            list.replaceChildren();
+            message.textContent = "Loading bookings…";
+
+            try {
+                const bookings = await api("/bookings");
+
+                message.textContent = bookings.length
+                    ? ""
+                    : "No bookings yet. Open Events to book tickets.";
+
+                for (const booking of bookings) {
+                    const card = document.createElement("article");
+                    card.className = "card booking-card";
+
+                    const badge = textElement(
+                        "span", booking.status, "badge"
+                    );
+
+                    card.append(
+                        textElement("h3", booking.title),
+                        badge,
+                        textElement(
+                            "p",
+                            "Booking #" + booking.booking_id +
+                            " · " + booking.quantity +
+                            (Number(booking.quantity) === 1
+                                ? " ticket"
+                                : " tickets")
+                        ),
+                        textElement(
+                            "p",
+                            "Payment reference: " +
+                            (booking.payment_reference ||
+                                "No payment recorded")
+                        )
+                    );
+
+                    if (booking.refund != null) {
+                        card.append(textElement(
+                            "p",
+                            "Refund: Rs. " +
+                            Number(booking.refund).toFixed(2)
+                        ));
+                    }
+
+                    if (booking.status === "active") {
+                        const actions = document.createElement("div");
+                        actions.className = "actions";
+
+                        const qrButton = makeButton("View QR tickets");
+                        const cancelButton = makeButton(
+                            "Cancel booking", "secondary"
+                        );
+
+                        const qrMessage = textElement("p", "");
+                        qrMessage.setAttribute("role", "status");
+
+                        const qrList = document.createElement("div");
+                        qrList.className = "qr-list";
+                        qrList.id = "booking-qr-" + booking.booking_id;
+                        qrList.hidden = true;
+
+                        qrButton.setAttribute("aria-expanded", "false");
+                        qrButton.setAttribute("aria-controls", qrList.id);
+
+                        const result = textElement("p", "");
+                        result.setAttribute("role", "status");
+
+                        let cancelled = false;
+                        let qrLoaded = false;
+
+                        qrButton.onclick = async function () {
+                            if (qrLoaded) {
+                                qrList.hidden = !qrList.hidden;
+
+                                qrButton.textContent = qrList.hidden
+                                    ? "View QR tickets"
+                                    : "Hide QR tickets";
+
+                                qrButton.setAttribute(
+                                    "aria-expanded",
+                                    String(!qrList.hidden)
+                                );
+                                return;
+                            }
+
+                            qrButton.disabled = true;
+                            qrMessage.textContent = "Loading tickets…";
+                            qrList.replaceChildren();
+
+                            try {
+                                const codes = await api(
+                                    "/bookings/" +
+                                    booking.booking_id + "/tickets"
+                                );
+
+                                if (cancelled) {
+                                    return;
+                                }
+
+                                qrMessage.textContent = codes.length
+                                    ? ""
+                                    : "No active tickets found.";
+
+                                for (const code of codes) {
+                                    const image = document.createElement("img");
+                                    image.src =
+                                        "/tickets/" +
+                                        encodeURIComponent(code) + "/qr";
+                                    image.alt = "QR ticket";
+                                    image.className = "qr-image";
+
+                                    qrList.append(
+                                        image,
+                                        textElement(
+                                            "p", "Ticket code: " + code
+                                        )
+                                    );
+                                }
+
+                                if (codes.length > 0) {
+                                    qrLoaded = true;
+                                    qrList.hidden = false;
+                                    qrButton.textContent = "Hide QR tickets";
+
+                                    qrButton.setAttribute(
+                                        "aria-expanded", "true"
+                                    );
+                                }
+                            } catch (error) {
+                                if (!cancelled) {
+                                    showMessage(
+                                        qrMessage,
+                                        errorText(
+                                            error,
+                                            "Unable to load QR tickets."
+                                        ),
+                                        true
+                                    );
+                                }
+                            } finally {
+                                qrButton.disabled = false;
+                            }
+                        };
+
+                        cancelButton.onclick = async function () {
+                            if (!confirm(
+                                "Cancel booking #" +
+                                booking.booking_id + "?"
+                            )) {
+                                return;
+                            }
+
+                            cancelButton.disabled = true;
+                            refresh.disabled = true;
+
+                            result.style.color = "#746980";
+                            result.textContent = "Cancelling…";
+
+                            try {
+                                const data = await api(
+                                    "/bookings/" +
+                                    booking.booking_id + "/cancel",
+                                    {method: "POST"}
+                                );
+
+                                cancelled = true;
+                                badge.textContent = "cancelled";
+                                badge.dataset.status = String(badge.textContent).toLowerCase();
+
+                                showMessage(
+                                    result,
+                                    "Refund: Rs. " +
+                                    Number(data.refund).toFixed(2)
+                                );
+
+                                actions.remove();
+                                qrList.remove();
+                                qrMessage.remove();
+                            } catch (error) {
+                                showMessage(
+                                    result,
+                                    errorText(
+                                        error,
+                                        "Connection lost. Refresh My bookings to check the status."
+                                    ),
+                                    true
+                                );
+                            } finally {
+                                cancelButton.disabled = false;
+                                refresh.disabled = false;
+                            }
+                        };
+
+                        actions.append(qrButton, cancelButton);
+                        card.append(actions, qrMessage, qrList, result);
+                    }
+
+                    list.append(card);
+                }
+            } catch (error) {
+                showMessage(
+                    message,
+                    errorText(
+                        error,
+                        "Unable to load bookings. Please try again."
+                    ),
+                    true
+                );
+            } finally {
+                refresh.disabled = false;
+            }
+        }
+
+        get("load-bookings").onclick = function () {
+            showBookings();
+            showNotifications();
+        };
+
+        // Availability notifications.
+        async function showNotifications() {
+            const list = get("notification-list");
+            const message = get("notifications-message");
+            const button = get("load-notifications");
+
+            button.disabled = true;
+            message.style.color = "#746980";
+            message.textContent = "Loading notifications…";
+            list.replaceChildren();
+
+            try {
+                const notifications = await api("/notifications");
+
+                message.textContent = notifications.length
+                    ? ""
+                    : "No notifications yet.";
+
+                for (const notification of notifications) {
+                    const item = document.createElement("article");
+                    item.className = "notification-item";
+
+                    item.append(
+                        textElement("p", notification.message)
+                    );
+
+                    list.append(item);
+                }
+            } catch (error) {
+                showMessage(
+                    message,
+                    errorText(
+                        error,
+                        "Unable to load notifications. Please try again."
+                    ),
+                    true
+                );
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        get("load-notifications").onclick = showNotifications;
+
+        // Load hire venue dropdown.
+        async function loadHireVenues() {
+            const select = get("hire-venue");
+            const message = get("hire-venue-message");
+            const refresh = get("refresh-hire-venues");
+            const previous = select.value;
+
+            refresh.disabled = true;
+            message.style.color = "#746980";
+            message.textContent = "Loading venues…";
+
+            try {
+                const venues = await api("/hire-venues");
+
+                select.replaceChildren();
+                select.append(new Option("Choose a venue", ""));
+
+                for (const venue of venues) {
+                    select.append(new Option(
+                        venue.name +
+                        " · " + venue.location +
+                        " · Capacity: " + venue.capacity +
+                        " · Rs. " +
+                        Number(venue.hourly_rate).toFixed(2) + "/hour",
+                        venue.id
+                    ));
+                }
+
+                if (venues.some(venue => String(venue.id) === previous)) {
+                    select.value = previous;
+                }
+
+                message.textContent = venues.length
+                    ? ""
+                    : "No venues are currently available for private hire.";
+            } catch (error) {
+                select.replaceChildren();
+                select.append(new Option("Unable to load venues", ""));
+
+                showMessage(
+                    message,
+                    errorText(error, "Unable to connect to the server."),
+                    true
+                );
+            } finally {
+                refresh.disabled = false;
+            }
+        }
+
+        get("refresh-hire-venues").onclick = loadHireVenues;
+
+        // Submit private venue hire.
+        get("hire-form").onsubmit = async function (event) {
+            event.preventDefault();
+
+            const button = get("hire-button");
+            const message = get("hire-message");
+            const result = get("hire-result");
+
+            const venueId = get("hire-venue").value;
+            const start = get("hire-start").value;
+            const end = get("hire-end").value;
+            const purpose = get("hire-purpose").value.trim();
+
+            result.replaceChildren();
+
+            if (!venueId) {
+                showMessage(message, "Choose a venue.", true);
+                return;
+            }
+
+            if (new Date(start) <= new Date()) {
+                showMessage(
+                    message,
+                    "Choose a start date and time in the future.",
+                    true
+                );
+                return;
+            }
+
+            if (new Date(end) <= new Date(start)) {
+                showMessage(
+                    message, "End time must be after start time.", true
+                );
+                return;
+            }
+
+            if (!purpose) {
+                showMessage(message, "Enter the hire purpose.", true);
+                return;
+            }
+
+            button.disabled = true;
+            message.style.color = "#746980";
+            message.textContent = "Submitting hire request…";
+
+            try {
+                const response = await fetch("/hires", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        venue_id: Number(venueId),
+                        start_time: start,
+                        end_time: end,
+                        purpose: purpose,
+                        guest_count: Number(get("hire-guests").value)
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    showMessage(
+                        message,
+                        backendError(
+                            data, "Check the venue, dates and guest count."
+                        ),
+                        true
+                    );
+
+                    if (
+                        data.detail &&
+                        data.detail.suggested_start &&
+                        data.detail.suggested_end
+                    ) {
+                        const suggestedStart = data.detail.suggested_start;
+                        const suggestedEnd = data.detail.suggested_end;
+
+                        result.append(
+                            textElement(
+                                "p",
+                                "Available from: " +
+                                new Date(suggestedStart).toLocaleString()
+                            ),
+                            textElement(
+                                "p",
+                                "Available until: " +
+                                new Date(suggestedEnd).toLocaleString()
+                            )
+                        );
+
+                        const useTime = makeButton(
+                            "Use suggested time", "secondary"
+                        );
+
+                        useTime.onclick = function () {
+                            get("hire-start").value =
+                                suggestedStart.slice(0, 16);
+
+                            get("hire-end").value =
+                                suggestedEnd.slice(0, 16);
+
+                            showMessage(
+                                message,
+                                "Suggested time filled in. Review it, then submit."
+                            );
+
+                            result.replaceChildren();
+                        };
+
+                        result.append(useTime);
+                    }
+
+                    return;
+                }
+
+                showMessage(message, "Hire request submitted.");
+
+                if (data.hire_id != null) {
+                    result.append(textElement(
+                        "p", "Hire request ID: " + data.hire_id
+                    ));
+                }
+
+                if (data.status) {
+                    result.append(textElement(
+                        "p", "Status: " + data.status
+                    ));
+                }
+
+                if (data.price != null) {
+                    result.append(textElement(
+                        "p",
+                        "Hire price: Rs. " +
+                        Number(data.price).toFixed(2)
+                    ));
+                }
+
+                get("hire-form").reset();
+            } catch {
+                showMessage(
+                    message,
+                    "Connection lost. Ask the administrator to check whether the request was saved before retrying.",
+                    true
+                );
+            } finally {
+                button.disabled = false;
+            }
+        };
+
+        // Switch between sign-in and attendee registration.
+        function showAuth(registering) {
+            get("login-form").hidden = registering;
+            get("show-register").hidden = registering;
+            get("register-form").hidden = !registering;
+            get("show-login").hidden = !registering;
+
+            get("auth-title").textContent = registering
+                ? "Create an attendee account"
+                : "Sign in";
+            get("auth-intro").textContent = registering
+                ? "Create an account to book tickets and request venue hire."
+                : "Sign in to book events, manage tickets and hire venues.";
+
+            get("password").value = "";
+            get("register-password").value = "";
+            get("confirm-password").value = "";
+            get("message").textContent = "";
+            get(registering ? "register-email" : "email").focus();
+        }
+
+        get("show-register").onclick = function () {
+            showAuth(true);
+        };
+
+        get("show-login").onclick = function () {
+            showAuth(false);
+        };
+
+        // Register an attendee. The server assigns the attendee role.
+        get("register-form").onsubmit = async function (event) {
+            event.preventDefault();
+
+            const email = get("register-email").value.trim().toLowerCase();
+            const password = get("register-password").value;
+            const confirmation = get("confirm-password").value;
+            const button = get("register-button");
+            const message = get("message");
+
+            if (password.length < 8) {
+                showMessage(message, "Use a password with at least 8 characters.", true);
+                return;
+            }
+
+            if (password !== confirmation) {
+                showMessage(message, "The passwords do not match.", true);
+                get("confirm-password").focus();
+                return;
+            }
+
+            button.disabled = true;
+            get("show-login").disabled = true;
+            button.textContent = "Creating account…";
+            message.style.color = "#746980";
+            message.textContent = "Creating your attendee account…";
+
+            try {
+                await api("/register", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({email: email, password: password})
+                });
+
+                get("register-form").reset();
+                get("email").value = email;
+                showAuth(false);
+                showMessage(message, "Account created. Sign in with your email and password.");
+            } catch (error) {
+                showMessage(
+                    message,
+                    errorText(error, "Connection lost. Try signing in to check whether the account was created."),
+                    true
+                );
+            } finally {
+                button.disabled = false;
+                get("show-login").disabled = false;
+                button.textContent = "Create account";
+            }
+        };
+
+        // Login and role-based navigation.
+        get("login-form").onsubmit = async function (event) {
+            event.preventDefault();
+
+            const button = get("login-button");
+            const message = get("message");
+
+            button.disabled = true;
+            button.textContent = "Signing in…";
+            get("show-register").disabled = true;
+            message.textContent = "";
+
+            try {
+                const data = await api("/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email: get("email").value,
+                        password: get("password").value
+                    })
+                });
+
+                get("password").value = "";
+
+                if (data.role === "staff") {
+                    window.location.href = "/scanner";
+                    return;
+                }
+
+                if (data.role === "admin") {
+                    window.location.href = "/admin-page";
+                    return;
+                }
+
+                if (data.role !== "attendee") {
+                    showMessage(
+                        message,
+                        "This account has an unsupported role.",
+                        true
+                    );
+                    return;
+                }
+
+                get("login-page").hidden = true;
+                get("attendee-app").hidden = false;
+                loadEventCategories();
+                openPage("events");
+            } catch (error) {
+                showMessage(
+                    message,
+                    errorText(
+                        error,
+                        "Unable to connect. Check that the server is running."
+                    ),
+                    true
+                );
+            } finally {
+                button.disabled = false;
+                button.textContent = "Sign in";
+                get("show-register").disabled = false;
+            }
+        };
+
+        async function showOffers() {
+            const list = get('offer-list');
+            const message = get('offers-message');
+            const refresh = get('refresh-offers');
+            refresh.disabled = true;
+            message.textContent = 'Loading your offers…';
+            list.replaceChildren();
+            try {
+                const offers = await api('/waitlist/offers');
+                message.textContent = offers.length ? '' : 'No active ticket holds.';
+                for (const offer of offers) {
+                    const card = textElement('div', '', 'ticket-details');
+                    card.append(textElement('h3', offer.title));
+                    card.append(textElement('p', offer.category + ' · 1 ticket · Rs. ' + Number(offer.price).toFixed(2)));
+                    const countdown = textElement('p', '');
+                    countdown.dataset.offerExpiry = offer.expires_at;
+                    card.append(countdown);
+                    const claim = makeButton('Claim ticket · Simulated payment');
+                    claim.dataset.claimExpiry = offer.expires_at;
+                    const status = textElement('p', '');
+                    status.setAttribute('role', 'status');
+                    claim.onclick = async () => {
+                        claim.disabled = true;
+                        try {
+                            const data = await api('/bookings', {
+                                method: 'POST', headers: {'Content-Type':'application/json'},
+                                body: JSON.stringify({ticket_category_id:offer.ticket_category_id, quantity:1})
+                            });
+                            showMessage(status, 'Booking #' + data.booking_id + ' confirmed.');
+                            claim.remove();
+                            countdown.remove();
+                            showBookings();
+                            showNotifications();
+                        } catch (error) {
+                            showMessage(status, error.message, true);
+                            claim.disabled = Date.parse(offer.expires_at) <= Date.now();
+                        }
+                    };
+                    card.append(claim, status);
+                    list.append(card);
+                }
+                updateOfferTimers();
+            } catch (error) {
+                showMessage(message, error.message, true);
+            } finally {
+                refresh.disabled = false;
+            }
+        }
+        function updateOfferTimers() {
+            document.querySelectorAll('[data-offer-expiry]').forEach(element => {
+                const seconds = Math.max(0, Math.ceil((Date.parse(element.dataset.offerExpiry) - Date.now()) / 1000));
+                element.textContent = seconds ? 'Time remaining: ' + Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0') : 'Hold expired. Refresh offers to check availability.';
+            });
+            document.querySelectorAll('[data-claim-expiry]').forEach(button => {
+                if (Date.parse(button.dataset.claimExpiry) <= Date.now()) button.disabled = true;
+            });
+        }
+        get('refresh-offers').onclick = showOffers;
+        setInterval(updateOfferTimers, 1000);
+    </script>
+</body>
+</html>
