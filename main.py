@@ -19,7 +19,7 @@ from starlette.middleware.sessions import SessionMiddleware  # Stores signed log
 from PIL import Image, UnidentifiedImageError  # Opens, resizes and saves uploaded images and detects invalid images.
 from database import BASE_DIR, connect, create_tables, INTEGRITY_ERRORS  # Uses the shared database path, connections, transactions and table setup.
 from agents import run_command, check_waitlist, campus_now  # Uses the agents to make decisions and check waiting attendees.
-
+import shutil  # Copies existing photos into persistent storage.
 
 # Check the waitlist repeatedly while the application is running.
 async def waitlist_loop():
@@ -74,8 +74,21 @@ def session_secret():
 
 # Create the FastAPI application and apply the security check to its routes.
 app = FastAPI(lifespan=lifespan, dependencies=[Depends(csrf_guard)])
-(BASE_DIR / 'uploads').mkdir(exist_ok=True)
-app.mount('/uploads', StaticFiles(directory=BASE_DIR / 'uploads'), name='uploads')
+# Railway provides the persistent volume path; locally use the project folder.
+storage_root = Path(os.getenv('RAILWAY_VOLUME_MOUNT_PATH') or BASE_DIR)
+UPLOAD_DIR = storage_root / 'uploads'
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+# Copy existing repository photos once, without replacing stored photos.
+original_uploads = BASE_DIR / 'uploads'
+if original_uploads.exists() and original_uploads.resolve() != UPLOAD_DIR.resolve():
+    for photo in original_uploads.iterdir():
+        destination = UPLOAD_DIR / photo.name
+        if photo.is_file() and not destination.exists():
+            shutil.copy2(photo, destination)
+
+# Image URLs stay the same, even when the files use persistent storage.
+app.mount('/uploads', StaticFiles(directory=UPLOAD_DIR), name='uploads')
 app.add_middleware(SessionMiddleware, secret_key=session_secret(), same_site='lax',
                    https_only=os.getenv('HTTPS_ONLY', 'false').lower()=='true')
 hasher = PasswordHash.recommended()
@@ -526,7 +539,7 @@ async def upload_venue_image(request: Request):
     try:
         with Image.open(BytesIO(content)) as image:
             image.thumbnail((1600, 1600))
-            image.convert("RGB").save(str(BASE_DIR / "uploads" / filename), "JPEG")
+            image.convert("RGB").save(str(UPLOAD_DIR / filename), "JPEG")
     except (UnidentifiedImageError, OSError, Image.DecompressionBombError):
         raise HTTPException(400, "Choose a valid JPG or PNG image")
 
