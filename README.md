@@ -85,17 +85,4 @@ Latest reported local result: **28 passed, 1 skipped, 1 deprecation warning**. T
 
 Manual local checks using Neon confirmed admin and attendee login, venue creation with a photo, event creation and publishing, a confirmed booking, a displayed QR ticket, dashboard sales figures and persistent agent activity.
 
-## Remaining verification and submission work
 
-- Confirm Google's browser warning is cleared.
-- Upload a new photo on the hosted site and confirm it survives redeployment; storage code is deployed, but this live test is pending.
-- Complete hosted role, booking, cancellation, waitlist, notification and hire checks.
-- Test the phone layout and camera/manual ticket entry, including duplicate and invalid scans within the permitted check-in window.
-- Run the optional PostgreSQL integration test against a separate test database.
-- Complete the ICA report, evidence and final submission checklist against the assessment brief.
-
-Railway currently shows a limited trial. Hosting availability depends on the account's remaining allowance and plan; do not assume indefinite free hosting.
-
-## Private files
-
-Do not commit `.env`, `.session_secret`, `.venv/` or `eventsphere.db`. Do not publish demo passwords, database credentials or session secrets. Venue image files are separate from Neon database records and require persistent file storage on the host.
