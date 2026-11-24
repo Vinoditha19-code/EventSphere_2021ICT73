@@ -130,6 +130,26 @@ def home():
     return FileResponse(BASE_DIR / "index.html")
 
 
+# Public session information; private records still require their original roles.
+@app.get('/session')
+def session_status(request: Request):
+    role = request.session.get('role')
+    signed_in = bool(request.session.get('email')) and role in {'admin', 'staff', 'attendee'}
+    return {'authenticated': signed_in, 'role': role if signed_in else None}
+
+
+# Public venue catalogue. Do not expose private hire requests or attendee information.
+@app.get('/public/venues')
+def public_venues():
+    with closing(connect()) as db:
+        rows = db.execute("""
+            SELECT id, name, location, capacity, description, image,
+                   hourly_rate, open_for_hire
+            FROM venues ORDER BY name
+        """).fetchall()
+    return [dict(row) for row in rows]
+
+
 # Fields the browser must send when signing in or registering.
 class Login(BaseModel):
     email: str
